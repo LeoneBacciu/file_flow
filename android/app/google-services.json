@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "93535413002",
+    "project_id": "fileflow-c55f0",
+    "storage_bucket": "fileflow-c55f0.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:93535413002:android:317e28fed3977b5d0190f3",
+        "android_client_info": {
+          "package_name": "com.dalmt.file_flow"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "93535413002-3rhqb5ls8spgj7jj98v532j0img16ndb.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.dalmt.file_flow",
+            "certificate_hash": "8b67cef45206fe9b4bae0a28b6fbbd8cbb07928a"
+          }
+        },
+        {
+          "client_id": "93535413002-9ht7ejj6312j5fds4elsje6j5crj2vp4.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDFPr4R2mlZuQUV6KqPGNNJ5QYjRAIc1YM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "93535413002-9ht7ejj6312j5fds4elsje6j5crj2vp4.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
