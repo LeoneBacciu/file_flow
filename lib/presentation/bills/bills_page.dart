@@ -11,10 +11,10 @@ class BillsPage extends StatefulIndexedPage {
   });
 
   @override
-  BillsPageState createState() => BillsPageState();
+  State<BillsPage> createState() => _BillsPageState();
 }
 
-class BillsPageState extends State<BillsPage> {
+class _BillsPageState extends State<BillsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -24,10 +24,14 @@ class BillsPageState extends State<BillsPage> {
       ),
       floatingActionButton: commonFloatingActionButton(
         context,
+        NavigationRoute.bills,
         () => widget.onNewDocument!(DocumentCategory.bill),
       ),
       bottomNavigationBar: commonNavigationBar(
-          context, NavigationRoute.bills, widget.onRouteChange),
+        context,
+        NavigationRoute.bills,
+        widget.onRouteChange,
+      ),
     );
   }
 }

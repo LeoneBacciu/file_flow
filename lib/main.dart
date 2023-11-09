@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:developer' as dev;
 
 import 'package:file_flow/models/document.dart';
+import 'package:file_flow/presentation/add/add_page.dart';
 import 'package:file_flow/presentation/settings/settings_page.dart';
 import 'package:file_flow/state/sync/sync_cubit.dart';
 import 'package:flutter/material.dart';
@@ -104,6 +105,7 @@ class _HomeStackState extends State<HomeStack> {
       setState(() => currentRoute = route);
 
   void onNewDocument(DocumentCategory category) {
-    print(category.jsonValue);
+    Navigator.of(context).push(
+        MaterialPageRoute(builder: (context) => AddPage(category: category)));
   }
 }

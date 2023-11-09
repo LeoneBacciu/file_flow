@@ -11,10 +11,10 @@ class BankPage extends StatefulIndexedPage {
   });
 
   @override
-  BankPageState createState() => BankPageState();
+  State<BankPage> createState() => _BankPageState();
 }
 
-class BankPageState extends State<BankPage> {
+class _BankPageState extends State<BankPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -24,6 +24,7 @@ class BankPageState extends State<BankPage> {
       ),
       floatingActionButton: commonFloatingActionButton(
         context,
+        NavigationRoute.bank,
         () => widget.onNewDocument!(DocumentCategory.bank),
       ),
       bottomNavigationBar: commonNavigationBar(

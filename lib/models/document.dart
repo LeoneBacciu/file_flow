@@ -13,6 +13,13 @@ enum DocumentCategory {
 
   factory DocumentCategory.fromJson(String json) =>
       values.firstWhere((e) => e.jsonValue == json);
+
+  static List<DocumentCategory> list() => [
+        DocumentCategory.card,
+        DocumentCategory.bill,
+        DocumentCategory.bank,
+        DocumentCategory.other
+      ];
 }
 
 class Document extends Equatable {

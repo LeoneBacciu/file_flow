@@ -47,9 +47,10 @@ NavigationBar commonNavigationBar(BuildContext context, NavigationRoute route,
     );
 
 FloatingActionButton commonFloatingActionButton(
-        BuildContext context, VoidCallback onPressed) =>
+        BuildContext context, Object heroTag, VoidCallback onPressed) =>
     FloatingActionButton(
       onPressed: onPressed,
+      heroTag: heroTag,
       backgroundColor: Theme.of(context).colorScheme.primaryContainer,
       child: const Icon(Icons.add),
     );
