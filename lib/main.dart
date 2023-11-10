@@ -105,7 +105,9 @@ class _HomeStackState extends State<HomeStack> {
       setState(() => currentRoute = route);
 
   void onNewDocument(DocumentCategory category) {
-    Navigator.of(context).push(
-        MaterialPageRoute(builder: (context) => AddPage(category: category)));
+    Navigator.of(context)
+        .push(MaterialPageRoute(
+            builder: (context) => AddPage(category: category)))
+        .whenComplete(() => setState(() {}));
   }
 }

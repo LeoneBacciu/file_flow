@@ -15,7 +15,7 @@ class _SettingsPageState extends State<SettingsPage> {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        title: Text('Impostazioni'),
+        title: const Text('Impostazioni'),
       ),
       bottomNavigationBar: commonNavigationBar(
         context,

@@ -42,7 +42,7 @@ class _CardsPageState extends SearchQueryState<CardsPage> {
                 children: (state is SyncLoaded)
                     ? state.documents
                         .where(queryFilter)
-                        .map((d) => CardsCard(title: d.name, path: d.preview))
+                        .map((d) => CardsCard(title: d.name, image: d.preview))
                         .toList()
                     : [],
               ),

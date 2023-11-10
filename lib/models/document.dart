@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:equatable/equatable.dart';
+import 'package:path/path.dart';
 
 enum DocumentCategory {
   card('card'),
@@ -26,7 +29,7 @@ class Document extends Equatable {
   final DocumentCategory category;
   final String name;
   final DateTime lastModified;
-  final List<String> files;
+  final List<File> files;
   final DocumentContent? content;
 
   const Document({
@@ -37,13 +40,15 @@ class Document extends Equatable {
     this.content,
   });
 
-  String get preview => 'assets/${files.firstOrNull}';
+  File get preview => files.first;
 
-  Document.fromJson(Map<String, dynamic> json)
+  Document.fromJson(Map<String, dynamic> json, File Function(String) fileHandle)
       : category = DocumentCategory.fromJson(json['category']),
         name = json['name'],
         lastModified = DateTime.parse(json['last_modified']),
-        files = List.castFrom(json['files']),
+        files = List.castFrom<dynamic, String>(json['files'])
+            .map(fileHandle)
+            .toList(),
         content = json.containsKey('content')
             ? DocumentContent.fromJson(json['content'])
             : null,
@@ -55,8 +60,8 @@ class Document extends Equatable {
     data['category'] = category.jsonValue;
     data['name'] = name;
     data['last_modified'] = lastModified.toIso8601String();
-    data['files'] = files;
-    data['content'] = content?.toJson();
+    data['files'] = files.map((f) => basename(f.path)).toList();
+    if (content != null) data['content'] = content!.toJson();
     return data;
   }
 

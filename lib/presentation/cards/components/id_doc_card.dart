@@ -1,11 +1,12 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 
 class CardsCard extends StatelessWidget {
   final String title;
-  final String path;
+  final File image;
 
-  const CardsCard({Key? key, required this.title, required this.path})
-      : super(key: key);
+  const CardsCard({super.key, required this.title, required this.image});
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +21,7 @@ class CardsCard extends StatelessWidget {
           children: [
             AspectRatio(
               aspectRatio: 85.60 / 53.98,
-              child: Image.asset(path),
+              child: Image.file(image),
             ),
             Padding(
               padding: const EdgeInsets.all(8.0),

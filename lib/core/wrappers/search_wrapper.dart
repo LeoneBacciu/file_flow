@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class SearchWrapper extends InheritedWidget {
   final query = '';
 
-  SearchWrapper({super.key, required super.child});
+  const SearchWrapper({super.key, required super.child});
 
 
   static SearchWrapper? maybeOf(BuildContext context) {

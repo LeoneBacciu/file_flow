@@ -36,6 +36,7 @@ class _ProfilePageState extends SearchQueryState<ProfilePage> {
     return Scaffold(
       body: BlocBuilder<SyncCubit, SyncState>(
         builder: (context, state) {
+          print((state is SyncLoaded) ? state.documents.length : null);
           return CustomScrollView(
             slivers: [
               ProfileOverview(),
@@ -46,7 +47,7 @@ class _ProfilePageState extends SearchQueryState<ProfilePage> {
                         .where(queryFilter)
                         .map((d) => ListTile(
                               leading: CircleAvatar(
-                                backgroundImage: AssetImage(d.preview),
+                                backgroundImage: FileImage(d.preview),
                               ),
                               title: Text(d.name),
                               subtitle: Text(d.category.jsonValue),
