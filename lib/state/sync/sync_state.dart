@@ -11,9 +11,10 @@ class SyncInitial extends SyncState {
 
 class SyncLoaded extends SyncState {
   final List<Document> documents;
+  final bool offline;
 
-  const SyncLoaded(this.documents);
+  const SyncLoaded(this.documents, {this.offline = false});
 
   @override
-  List<Object?> get props => [documents];
+  List<Object?> get props => [documents.length, offline, documents];
 }

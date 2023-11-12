@@ -68,7 +68,7 @@ class _AddPageState extends State<AddPage> {
         ),
         floatingActionButton: FloatingActionButton(
           onPressed: () {
-            BlocProvider.of<SyncCubit>(context).addFile(
+            BlocProvider.of<SyncCubit>(context).addDocument(
               Document(
                 category: category,
                 name: name,

@@ -4,13 +4,11 @@ import 'dart:developer' as dev;
 import 'package:file_flow/models/document.dart';
 import 'package:file_flow/presentation/add/add_page.dart';
 import 'package:file_flow/presentation/settings/settings_page.dart';
+import 'package:file_flow/repositories/locator.dart';
 import 'package:file_flow/state/sync/sync_cubit.dart';
 import 'package:flutter/material.dart';
-import 'package:file_flow/core/wrappers/auth_wrapper.dart';
 import 'package:file_flow/core/components/common.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:google_sign_in/google_sign_in.dart';
-import 'package:googleapis/drive/v3.dart' as drive;
 
 import 'presentation/bank/bank_page.dart';
 import 'presentation/bills/bills_page.dart';
@@ -20,6 +18,9 @@ import 'presentation/cards/cards_page.dart';
 void main() async {
   runZonedGuarded(() {
     WidgetsFlutterBinding.ensureInitialized();
+
+    loadLocators();
+
     runApp(MultiBlocProvider(
       providers: [
         ...SyncCubitProvider.getProviders(),
@@ -46,12 +47,7 @@ class MyApp extends StatelessWidget {
         ),
         useMaterial3: true,
       ),
-      home: AuthWrapper(
-        googleSignIn: GoogleSignIn.standard(scopes: [
-          drive.DriveApi.driveAppdataScope,
-        ]),
-        child: const HomeStack(),
-      ),
+      home: const HomeStack(),
     );
   }
 }
@@ -64,7 +60,6 @@ class HomeStack extends StatefulWidget {
 }
 
 class _HomeStackState extends State<HomeStack> {
-  final titles = ['Carte', 'Bollette', null, 'Finanze', 'Impostazioni'];
   var currentRoute = NavigationRoute.profile;
 
   @override
@@ -105,9 +100,10 @@ class _HomeStackState extends State<HomeStack> {
       setState(() => currentRoute = route);
 
   void onNewDocument(DocumentCategory category) {
-    Navigator.of(context)
-        .push(MaterialPageRoute(
-            builder: (context) => AddPage(category: category)))
-        .whenComplete(() => setState(() {}));
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => AddPage(category: category),
+      ),
+    );
   }
 }

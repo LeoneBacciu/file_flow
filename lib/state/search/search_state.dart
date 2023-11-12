@@ -22,7 +22,6 @@ class SearchState with ChangeNotifier {
       );
 
   void submit(String query) {
-    print(query);
     _query = query;
     notifyListeners();
   }

@@ -36,7 +36,6 @@ class _ProfilePageState extends SearchQueryState<ProfilePage> {
     return Scaffold(
       body: BlocBuilder<SyncCubit, SyncState>(
         builder: (context, state) {
-          print((state is SyncLoaded) ? state.documents.length : null);
           return CustomScrollView(
             slivers: [
               ProfileOverview(),
@@ -48,6 +47,12 @@ class _ProfilePageState extends SearchQueryState<ProfilePage> {
                         .map((d) => ListTile(
                               leading: CircleAvatar(
                                 backgroundImage: FileImage(d.preview),
+                              ),
+                              trailing: IconButton(
+                                onPressed: () =>
+                                    BlocProvider.of<SyncCubit>(context)
+                                        .deleteDocument(d),
+                                icon: const Icon(Icons.delete),
                               ),
                               title: Text(d.name),
                               subtitle: Text(d.category.jsonValue),
