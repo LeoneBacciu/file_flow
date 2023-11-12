@@ -127,13 +127,16 @@ class DriveRepository {
       $fields: defaultFileFields,
     );
     for (final remoteFile in remoteFiles.files!) {
+      final localFile = File('${directory.path}/${remoteFile.name}');
+      if (localFile.existsSync()) continue;
+
       final remoteFileSource = await api.files.get(
         remoteFile.id!,
         downloadOptions: drive.DownloadOptions.fullMedia,
       );
       if (remoteFileSource is drive.Media) {
         final bytes = await remoteFileSource.stream.expand((i) => i).toList();
-        File('${directory.path}/${remoteFile.name}').writeAsBytesSync(bytes);
+        localFile.writeAsBytesSync(bytes);
       }
     }
     return true;
@@ -204,21 +207,24 @@ class DriveRepository {
     return true;
   }
 
-  Future<bool> deleteFiles() async {
+  Future<bool> deleteFiles(List<File> files) async {
     final api = await driveApi;
     if (api == null) return false;
 
     final filesFolder = await getOrCreateFilesFolder();
     if (filesFolder == null) return false;
 
-    final remoteFiles = await api.files.list(
-      spaces: appDataFolder,
-      q: "'${filesFolder.id}' in parents and mimeType != '$folderMimeType'",
-      $fields: defaultFileFields,
-    );
-    for (final remoteFile in remoteFiles.files!) {
-      await api.files.delete(remoteFile.id!);
+    for (final localFile in files) {
+      final remoteFiles = await api.files.list(
+        spaces: appDataFolder,
+        q: "'${filesFolder.id}' in parents and name = '${basename(localFile.path)}' and mimeType != '$folderMimeType'",
+        $fields: defaultFileFields,
+      );
+      for (final remoteFile in remoteFiles.files!) {
+        await api.files.delete(remoteFile.id!);
+      }
     }
+
     return true;
   }
 

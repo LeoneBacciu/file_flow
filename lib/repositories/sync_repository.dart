@@ -6,6 +6,7 @@ import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:uuid/uuid.dart';
 
+import '../core/functions.dart';
 import 'drive_repository.dart';
 
 class SyncRepository {
@@ -68,7 +69,7 @@ class SyncRepository {
     return await loadOffline();
   }
 
-  Future<List<Document>> addDocument(
+  Future<(List<Document>, Future<List<Document>>)> addDocument(
       List<Document> documents, Document document) async {
     final spec = await getOrCreateSpec();
 
@@ -82,28 +83,32 @@ class SyncRepository {
     spec.writeAsStringSync(
         json.encode(documentsCopy.map((d) => d.toJson()).toList()));
 
-    await driveRepository.uploadSpec(spec);
-    await driveRepository.uploadFiles(copiedFiles);
+    final uploadResult = Future.wait([
+      driveRepository.uploadSpec(spec),
+      driveRepository.uploadFiles(copiedFiles)
+    ]).then(
+      (value) => value.every(id) ? Future.value(documentsCopy) : loadOnline(),
+    );
 
-    return documentsCopy;
+    return (documentsCopy, uploadResult);
   }
 
-  Future<List<Document>> deleteDocument(
+  Future<(List<Document>, Future<List<Document>>)> deleteDocument(
       List<Document> documents, Document document) async {
     final documentsCopy = [...documents]..remove(document);
 
     final spec = await getOrCreateSpec();
     spec.writeAsStringSync(
         json.encode(documentsCopy.map((d) => d.toJson()).toList()));
-    await driveRepository.uploadSpec(spec);
 
-    for (final file in document.files) {
-      await driveRepository.deleteFile(file);
-    }
+    final uploadResult = Future.wait([
+      driveRepository.uploadSpec(spec),
+      driveRepository.deleteFiles(document.files),
+    ]).then(
+      (value) => value.every(id) ? Future.value(documentsCopy) : loadOnline(),
+    );
 
-    await driveRepository.uploadSpec(spec);
-
-    return documentsCopy;
+    return (documentsCopy, uploadResult);
   }
 
   Future<void> clearAll() async {

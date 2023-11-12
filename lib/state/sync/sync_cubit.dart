@@ -16,8 +16,12 @@ class SyncCubit extends Cubit<SyncState> {
   SyncCubit({required this.syncRepository}) : super(SyncInitial());
 
   void load() async {
+    final lastState = state;
+    emit(SyncLoadedSyncing(lastState is SyncLoaded ? lastState.documents : []));
+
     final offlineDocs = await syncRepository.loadOffline();
-    emit(SyncLoaded(offlineDocs));
+    emit(SyncLoadedSyncing(offlineDocs));
+
     try {
       final onlineDocs = await syncRepository.loadOnline();
       emit(SyncLoaded(onlineDocs));
@@ -27,31 +31,51 @@ class SyncCubit extends Cubit<SyncState> {
     } catch (e, s) {
       print(e);
       print(s);
-      emit(SyncLoaded(offlineDocs, offline: true));
+      emit(SyncLoadedOffline(offlineDocs));
     }
   }
 
   void addDocument(Document document) async {
-    final s = state;
-    if (s is SyncLoaded) {
-      try {
-        final docs = await syncRepository.addDocument(s.documents, document);
-        emit(SyncLoaded(docs));
-      } on drive.DetailedApiRequestError catch (e) {
-        print(e.jsonResponse);
-      }
+    final lastState = state;
+    emit(SyncLoadedSyncing(lastState is SyncLoaded ? lastState.documents : []));
+
+    try {
+      final onlineDocs = await syncRepository.loadOnline();
+      emit(SyncLoadedSyncing(onlineDocs));
+
+      final (newDocs, uploadedDocs) =
+          await syncRepository.addDocument(onlineDocs, document);
+      emit(SyncLoadedSyncing(newDocs));
+      emit(SyncLoaded(await uploadedDocs));
+    } on drive.DetailedApiRequestError catch (e) {
+      print(e.jsonResponse);
+      rethrow;
+    } catch (e, s) {
+      print(e);
+      print(s);
+      emit(SyncLoadedOffline(lastState is SyncLoaded ? lastState.documents : []));
     }
   }
 
   void deleteDocument(Document document) async {
-    final s = state;
-    if (s is SyncLoaded) {
-      try {
-        final docs = await syncRepository.deleteDocument(s.documents, document);
-        emit(SyncLoaded(docs));
-      } on drive.DetailedApiRequestError catch (e) {
-        print(e.jsonResponse);
-      }
+    final lastState = state;
+    emit(SyncLoadedSyncing(lastState is SyncLoaded ? lastState.documents : []));
+
+    try {
+      final onlineDocs = await syncRepository.loadOnline();
+      emit(SyncLoadedSyncing(onlineDocs));
+
+      final (newDocs, uploadedDocs) = await syncRepository.deleteDocument(
+          onlineDocs, onlineDocs.firstWhere((d) => d.uuid == document.uuid));
+      emit(SyncLoadedSyncing(newDocs));
+      emit(SyncLoaded(await uploadedDocs));
+    } on drive.DetailedApiRequestError catch (e) {
+      print(e.jsonResponse);
+      rethrow;
+    } catch (e, s) {
+      print(e);
+      print(s);
+      emit(SyncLoadedOffline(lastState is SyncLoaded ? lastState.documents : []));
     }
   }
 
@@ -59,8 +83,6 @@ class SyncCubit extends Cubit<SyncState> {
   void onChange(Change<SyncState> change) {
     super.onChange(change);
     print(change.toString());
-    print(change.currentState.toString());
-    print(change.nextState.toString());
   }
 
   @override

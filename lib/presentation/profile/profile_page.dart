@@ -34,7 +34,28 @@ class _ProfilePageState extends SearchQueryState<ProfilePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: BlocBuilder<SyncCubit, SyncState>(
+      body: BlocConsumer<SyncCubit, SyncState>(
+        listener: (BuildContext context, SyncState state) {
+          if (state is SyncLoadedSyncing) {
+            ScaffoldMessenger.of(context).clearSnackBars();
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Syncing'),
+                duration: Duration(days: 365),
+              ),
+            );
+          } else if (state is SyncLoadedOffline) {
+            ScaffoldMessenger.of(context).clearSnackBars();
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Offline'),
+                duration: Duration(days: 365),
+              ),
+            );
+          } else {
+            ScaffoldMessenger.of(context).clearSnackBars();
+          }
+        },
         builder: (context, state) {
           return CustomScrollView(
             slivers: [

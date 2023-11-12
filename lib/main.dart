@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:developer' as dev;
 
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:file_flow/models/document.dart';
 import 'package:file_flow/presentation/add/add_page.dart';
 import 'package:file_flow/presentation/settings/settings_page.dart';
@@ -61,11 +62,16 @@ class HomeStack extends StatefulWidget {
 
 class _HomeStackState extends State<HomeStack> {
   var currentRoute = NavigationRoute.profile;
+  late StreamSubscription<ConnectivityResult> subscription;
 
   @override
   void initState() {
     super.initState();
-    BlocProvider.of<SyncCubit>(context).load();
+    subscription = Connectivity()
+        .onConnectivityChanged
+        .listen((ConnectivityResult result) {
+      BlocProvider.of<SyncCubit>(context).load();
+    });
   }
 
   @override
@@ -105,5 +111,11 @@ class _HomeStackState extends State<HomeStack> {
         builder: (context) => AddPage(category: category),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    subscription.cancel();
+    super.dispose();
   }
 }

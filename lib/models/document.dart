@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:equatable/equatable.dart';
 import 'package:path/path.dart';
+import 'package:uuid/uuid.dart';
 
 enum DocumentCategory {
   card('card'),
@@ -26,13 +27,23 @@ enum DocumentCategory {
 }
 
 class Document extends Equatable {
+  final String uuid;
   final DocumentCategory category;
   final String name;
   final DateTime lastModified;
   final List<File> files;
   final DocumentContent? content;
 
-  const Document({
+  Document({
+    required this.category,
+    required this.name,
+    required this.lastModified,
+    required this.files,
+    this.content,
+  }) : uuid = const Uuid().v4();
+
+  const Document.uuid({
+    required this.uuid,
     required this.category,
     required this.name,
     required this.lastModified,
@@ -43,7 +54,8 @@ class Document extends Equatable {
   File get preview => files.first;
 
   Document.fromJson(Map<String, dynamic> json, File Function(String) fileHandle)
-      : category = DocumentCategory.fromJson(json['category']),
+      : uuid = json['id'],
+        category = DocumentCategory.fromJson(json['category']),
         name = json['name'],
         lastModified = DateTime.parse(json['last_modified']),
         files = List.castFrom<dynamic, String>(json['files'])
@@ -57,6 +69,7 @@ class Document extends Equatable {
 
   Map<String, dynamic> toJson() {
     final data = <String, dynamic>{};
+    data['id'] = uuid;
     data['category'] = category.jsonValue;
     data['name'] = name;
     data['last_modified'] = lastModified.toIso8601String();
@@ -66,7 +79,8 @@ class Document extends Equatable {
   }
 
   @override
-  List<Object?> get props => [category, name, lastModified, files, content];
+  List<Object?> get props =>
+      [uuid, category, name, lastModified, files, content];
 }
 
 class DocumentContent extends Equatable {
