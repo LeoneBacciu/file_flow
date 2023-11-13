@@ -149,10 +149,7 @@ extension DocumentsExtension on List<Document> {
     }
   }
 
-  void replace(Document document) {
-    removeWhere((d) => d.uuid == document.uuid);
-    add(document);
-  }
+  void replaceUuid(Document document) => this[indexWhere((d) => d.uuid == document.uuid)] = document;
 
   String serialize() => json.encode(map((d) => d.toJson()).toList());
 

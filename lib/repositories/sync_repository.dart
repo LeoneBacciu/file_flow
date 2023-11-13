@@ -47,7 +47,7 @@ class SyncRepository {
     final fileDir = await getOrCreateFilesDirectory();
     return files
         .map((e) => e.copySync(
-            '${fileDir.path}/${const Uuid().v4()}${extension(e.path)}'))
+            '${fileDir.path}/${const Uuid().v4()}.jpeg'))
         .toList();
   }
 
@@ -115,7 +115,7 @@ class SyncRepository {
       ..clear()
       ..addAll(copiedFiles);
 
-    final documentsCopy = [...documents]..replace(document);
+    final documentsCopy = [...documents]..replaceUuid(document);
 
     spec.writeAsStringSync(documentsCopy.serialize());
 

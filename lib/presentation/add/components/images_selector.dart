@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:file_flow/core/convert.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 
@@ -79,7 +80,7 @@ class _ImagesSelectorState extends State<ImagesSelector> {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           ElevatedButton(
-                            onPressed: () => print('edit $index'),
+                            onPressed: () => editImage(index),
                             style: ElevatedButton.styleFrom(
                               shape: const CircleBorder(),
                               padding: const EdgeInsets.all(0),
@@ -87,7 +88,8 @@ class _ImagesSelectorState extends State<ImagesSelector> {
                             child: const Icon(Icons.edit),
                           ),
                           ElevatedButton(
-                            onPressed: () => update(() => images.removeAt(index)),
+                            onPressed: () =>
+                                update(() => images.removeAt(index)),
                             style: ElevatedButton.styleFrom(
                               shape: const CircleBorder(),
                               padding: const EdgeInsets.all(8),
@@ -111,11 +113,25 @@ class _ImagesSelectorState extends State<ImagesSelector> {
     FilePickerResult? result = await FilePicker.platform.pickFiles(
       type: FileType.custom,
       allowedExtensions: ['jpg', 'jpeg', 'png', 'pdf'],
+      allowMultiple: true,
     );
     if (result != null) {
-      update(() {
-        images.add(File(result.paths.first!));
-      });
+      final files = await FilesConverter.convert(
+          result.files.map((f) => File(f.path!)).toList());
+      update(() => images.addAll(files));
+    }
+  }
+
+  void editImage(int index) async {
+    FilePickerResult? result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['jpg', 'jpeg', 'png', 'pdf'],
+      allowMultiple: false,
+    );
+    if (result != null) {
+      final files =
+          await FilesConverter.convert([File(result.files.first.path!)]);
+      update(() => images[index] = files.first);
     }
   }
 }
