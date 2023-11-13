@@ -5,10 +5,12 @@ import 'package:file_flow/core/components/search_query_state.dart';
 import 'package:file_flow/core/components/stateful_indexed_page.dart';
 import 'package:file_flow/core/components/common.dart';
 import 'package:file_flow/models/document.dart';
+import 'package:file_flow/presentation/preview/preview_page.dart';
 import 'package:file_flow/presentation/profile/components/profile_overview.dart';
 import 'package:file_flow/state/sync/sync_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl/intl.dart';
 
 class ProfilePage extends StatefulIndexedPage {
   const ProfilePage({
@@ -34,28 +36,7 @@ class _ProfilePageState extends SearchQueryState<ProfilePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: BlocConsumer<SyncCubit, SyncState>(
-        listener: (BuildContext context, SyncState state) {
-          if (state is SyncLoadedSyncing) {
-            ScaffoldMessenger.of(context).clearSnackBars();
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Syncing'),
-                duration: Duration(days: 365),
-              ),
-            );
-          } else if (state is SyncLoadedOffline) {
-            ScaffoldMessenger.of(context).clearSnackBars();
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Offline'),
-                duration: Duration(days: 365),
-              ),
-            );
-          } else {
-            ScaffoldMessenger.of(context).clearSnackBars();
-          }
-        },
+      body: BlocBuilder<SyncCubit, SyncState>(
         builder: (context, state) {
           return CustomScrollView(
             slivers: [
@@ -64,21 +45,29 @@ class _ProfilePageState extends SearchQueryState<ProfilePage> {
               SliverList.list(
                 children: (state is SyncLoaded)
                     ? state.documents
+                        .sorted(querySort)
                         .where(queryFilter)
-                        .map((d) => ListTile(
-                              leading: CircleAvatar(
-                                backgroundImage: FileImage(d.preview),
+                        .map(
+                          (d) => ListTile(
+                            leading: CircleAvatar(
+                              backgroundImage: FileImage(d.preview),
+                            ),
+                            trailing: IconButton(
+                              onPressed: () =>
+                                  BlocProvider.of<SyncCubit>(context)
+                                      .deleteDocument(d),
+                              icon: const Icon(Icons.delete),
+                            ),
+                            title: Text(d.name),
+                            subtitle: Text(DateFormat('HH:mm - dd/MM/yyyy')
+                                .format(d.lastModified)),
+                            onTap: () => Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (context) => PreviewPage(document: d),
                               ),
-                              trailing: IconButton(
-                                onPressed: () =>
-                                    BlocProvider.of<SyncCubit>(context)
-                                        .deleteDocument(d),
-                                icon: const Icon(Icons.delete),
-                              ),
-                              title: Text(d.name),
-                              subtitle: Text(d.category.jsonValue),
-                              onTap: () {},
-                            ))
+                            ),
+                          ),
+                        )
                         .toList()
                     : [],
               ),

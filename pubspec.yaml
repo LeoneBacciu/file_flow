@@ -51,6 +51,8 @@ dependencies:
   uuid: ^4.2.1
   get_it: ^7.6.4
   connectivity_plus: ^5.0.1
+  expandable_page_view: ^1.0.17
+  share_plus: ^7.2.1
 
 
   # The following adds the Cupertino Icons font to your application.

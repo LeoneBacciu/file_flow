@@ -48,7 +48,29 @@ class MyApp extends StatelessWidget {
         ),
         useMaterial3: true,
       ),
-      home: const HomeStack(),
+      home: BlocListener<SyncCubit, SyncState>(
+          listener: (BuildContext context, state) {
+            if (state is SyncLoadedSyncing) {
+              ScaffoldMessenger.of(context).clearSnackBars();
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Syncing'),
+                  duration: Duration(days: 365),
+                ),
+              );
+            } else if (state is SyncLoadedOffline) {
+              ScaffoldMessenger.of(context).clearSnackBars();
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Offline'),
+                  duration: Duration(days: 365),
+                ),
+              );
+            } else {
+              ScaffoldMessenger.of(context).clearSnackBars();
+            }
+          },
+          child: const HomeStack()),
     );
   }
 }

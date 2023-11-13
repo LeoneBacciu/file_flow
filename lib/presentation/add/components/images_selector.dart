@@ -3,18 +3,19 @@ import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 
-class ImagesPreview extends StatefulWidget {
+class ImagesSelector extends StatefulWidget {
   final void Function(List<File>) onChange;
+  final List<File>? initialImages;
 
-  const ImagesPreview({super.key, required this.onChange});
+  const ImagesSelector({super.key, required this.onChange, this.initialImages});
 
   @override
-  State<ImagesPreview> createState() => _ImagesPreviewState();
+  State<ImagesSelector> createState() => _ImagesSelectorState();
 }
 
-class _ImagesPreviewState extends State<ImagesPreview> {
+class _ImagesSelectorState extends State<ImagesSelector> {
   final PageController _controller = PageController(viewportFraction: 0.8);
-  List<File> images = [];
+  late List<File> images = widget.initialImages ?? [];
 
   void update(VoidCallback fn) {
     setState(fn);

@@ -1,9 +1,10 @@
 import 'dart:io';
 
+import 'package:file_flow/core/functions.dart';
 import 'package:file_flow/models/document.dart';
 import 'package:file_flow/presentation/add/components/category_dropdown.dart';
 import 'package:file_flow/presentation/add/components/content_form.dart';
-import 'package:file_flow/presentation/add/components/images_preview.dart';
+import 'package:file_flow/presentation/add/components/images_selector.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -28,61 +29,61 @@ class _AddPageState extends State<AddPage> {
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      child: Scaffold(
-        body: SafeArea(
-          child: SingleChildScrollView(
-            child: Column(
-              children: [
-                ImagesPreview(
-                  onChange: (i) => setState(() => images = i),
-                ),
-                CategoryDropdown(
-                  category: category,
-                  onChange: (c) => setState(() => category = c),
-                ),
-                const Separator.height(30),
-                SizedBox(
-                  width: 300,
-                  child: TextField(
-                    onChanged: (s) => setState(() => name = s),
-                    decoration: const InputDecoration(
-                      border: OutlineInputBorder(),
-                      labelText: 'Nome Documento',
-                    ),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Add ${category.jsonValue.capitalize()}'),
+      ),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              ImagesSelector(
+                onChange: (i) => setState(() => images = i),
+              ),
+              CategoryDropdown(
+                category: category,
+                onChange: (c) => setState(() => category = c),
+              ),
+              const Separator.height(30),
+              SizedBox(
+                width: 300,
+                child: TextField(
+                  onChanged: (s) => setState(() => name = s),
+                  decoration: const InputDecoration(
+                    border: OutlineInputBorder(),
+                    labelText: 'Nome Documento',
                   ),
                 ),
-                const Separator.height(30),
-                AnimatedSwitcher(
-                  duration: const Duration(seconds: 2),
-                  child: category.parsing && images.isNotEmpty
-                      ? ContentForm(
-                          source: images.first,
-                          onChange: (c) => setState(() => documentContent = c),
-                        )
-                      : const SizedBox(),
-                ),
-              ],
-            ),
+              ),
+              const Separator.height(30),
+              AnimatedSwitcher(
+                duration: const Duration(seconds: 2),
+                child: category.parsing && images.isNotEmpty
+                    ? ContentForm(
+                        source: images.first,
+                        onChange: (c) => setState(() => documentContent = c),
+                      )
+                    : const SizedBox(),
+              ),
+            ],
           ),
         ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            BlocProvider.of<SyncCubit>(context).addDocument(
-              Document(
-                category: category,
-                name: name,
-                lastModified: DateTime.now(),
-                files: images,
-                content: documentContent,
-              ),
-            );
-            Navigator.of(context).pop();
-          },
-          child: const Icon(Icons.save),
-        ),
       ),
-      onWillPop: () async => true,
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          BlocProvider.of<SyncCubit>(context).addDocument(
+            Document(
+              category: category,
+              name: name,
+              lastModified: DateTime.now(),
+              files: images,
+              content: documentContent,
+            ),
+          );
+          Navigator.of(context).pop();
+        },
+        child: const Icon(Icons.save),
+      ),
     );
   }
 
