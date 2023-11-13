@@ -1,12 +1,11 @@
-import 'dart:convert' show json;
 import 'dart:io';
 
+import 'package:file_flow/core/optimistic_call.dart';
 import 'package:file_flow/models/document.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:uuid/uuid.dart';
 
-import '../core/functions.dart';
 import 'drive_repository.dart';
 
 class SyncRepository {
@@ -52,13 +51,22 @@ class SyncRepository {
         .toList();
   }
 
-  File Function(String) getFile(Map<String, File> files) => (f) => files[f]!;
+  Future<void> cleanupFiles(List<File> files) async {
+    final fileDir = await getOrCreateFilesDirectory();
+    Future.wait(fileDir
+        .listSync(followLinks: false)
+        .where((f) => !files.containsPath(f.path))
+        .cast<File>()
+        .map((f) => f.delete()));
+  }
 
   Future<List<Document>> loadOffline() async {
     final spec = await getOrCreateSpec();
     final files = await getFilesMap();
-    final parsed = List.from(json.decode(spec.readAsStringSync()));
-    return parsed.map((d) => Document.fromJson(d, getFile(files))).toList();
+    final docs =
+        Document.deserialize(spec.readAsStringSync(), (f) => files[f]!);
+    cleanupFiles(docs.getFiles());
+    return docs;
   }
 
   Future<List<Document>> loadOnline() async {
@@ -66,10 +74,12 @@ class SyncRepository {
     final filesDir = await getOrCreateFilesDirectory();
     await driveRepository.downloadSpec(spec);
     await driveRepository.downloadFiles(filesDir);
-    return await loadOffline();
+    final docs = await loadOffline();
+    driveRepository.cleanupFiles(docs.getFiles());
+    return docs;
   }
 
-  Future<(List<Document>, Future<List<Document>>)> addDocument(
+  Future<OptimisticCall<List<Document>>> addDocument(
       List<Document> documents, Document document) async {
     final spec = await getOrCreateSpec();
 
@@ -80,35 +90,70 @@ class SyncRepository {
 
     final documentsCopy = [...documents, document];
 
-    spec.writeAsStringSync(
-        json.encode(documentsCopy.map((d) => d.toJson()).toList()));
+    spec.writeAsStringSync(documentsCopy.serialize());
 
-    final uploadResult = Future.wait([
-      driveRepository.uploadSpec(spec),
-      driveRepository.uploadFiles(copiedFiles)
-    ]).then(
-      (value) => value.every(id) ? Future.value(documentsCopy) : loadOnline(),
+    return OptimisticCall(
+      value: documentsCopy,
+      onSend: (_) => Future.wait([
+        driveRepository.uploadSpec(spec),
+        driveRepository.uploadFiles(copiedFiles)
+      ]),
+      onError: (_) async {
+        spec.writeAsStringSync(documents.serialize());
+        await cleanupFiles(documents.getFiles());
+        return documents;
+      },
     );
-
-    return (documentsCopy, uploadResult);
   }
 
-  Future<(List<Document>, Future<List<Document>>)> deleteDocument(
+  Future<OptimisticCall<List<Document>>> updateDocument(
+      List<Document> documents, Document document) async {
+    final spec = await getOrCreateSpec();
+
+    final copiedFiles = await copyFiles(document.files);
+    document.files
+      ..clear()
+      ..addAll(copiedFiles);
+
+    final documentsCopy = [...documents]..replace(document);
+
+    spec.writeAsStringSync(documentsCopy.serialize());
+
+    return OptimisticCall(
+      value: documentsCopy,
+      onSend: (d) => Future.wait([
+        driveRepository
+            .uploadSpec(spec)
+            .then((value) => driveRepository.cleanupFiles(d.getFiles())),
+        driveRepository.uploadFiles(copiedFiles)
+      ]),
+      onError: (_) async {
+        spec.writeAsStringSync(documents.serialize());
+        await cleanupFiles(documents.getFiles());
+        return documents;
+      },
+    );
+  }
+
+  Future<OptimisticCall<List<Document>>> deleteDocument(
       List<Document> documents, Document document) async {
     final documentsCopy = [...documents]..remove(document);
 
     final spec = await getOrCreateSpec();
-    spec.writeAsStringSync(
-        json.encode(documentsCopy.map((d) => d.toJson()).toList()));
+    spec.writeAsStringSync(documentsCopy.serialize());
 
-    final uploadResult = Future.wait([
-      driveRepository.uploadSpec(spec),
-      driveRepository.deleteFiles(document.files),
-    ]).then(
-      (value) => value.every(id) ? Future.value(documentsCopy) : loadOnline(),
+    return OptimisticCall(
+      value: documentsCopy,
+      onSend: (_) => Future.wait([
+        driveRepository.uploadSpec(spec),
+        driveRepository.deleteFiles(document.files),
+      ]),
+      onSuccess: (_) => Future.wait(document.files.map((f) => f.delete())),
+      onError: (_) async {
+        spec.writeAsStringSync(documents.serialize());
+        return documents;
+      },
     );
-
-    return (documentsCopy, uploadResult);
   }
 
   Future<void> clearAll() async {

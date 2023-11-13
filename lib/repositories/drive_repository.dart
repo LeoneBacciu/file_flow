@@ -1,5 +1,7 @@
 import 'dart:io';
 
+import 'package:file_flow/core/errors.dart';
+import 'package:file_flow/models/document.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:googleapis/drive/v3.dart' as drive;
@@ -18,10 +20,11 @@ class DriveRepository {
 
   Future<GoogleSignInAccount?> get user => googleSignIn.signIn();
 
-  Future<drive.DriveApi?> get driveApi async {
+  Future<drive.DriveApi> get driveApi async {
     final googleUser = await user;
-    final headers = await googleUser?.authHeaders;
-    if (headers == null) return null;
+    if (googleUser == null) throw DriveNotLoggedInException();
+
+    final headers = await googleUser.authHeaders;
 
     final client = GoogleAuthClient(headers);
     final driveApi = drive.DriveApi(client);
@@ -53,9 +56,8 @@ class DriveRepository {
     await googleSignIn.signOut();
   }
 
-  Future<drive.File?> getOrCreateSpec() async {
+  Future<drive.File> getOrCreateSpec() async {
     final api = await driveApi;
-    if (api == null) return null;
 
     final spec = await api.files.list(
       spaces: appDataFolder,
@@ -74,12 +76,11 @@ class DriveRepository {
         uploadMedia: drive.Media(mediaStream, defaultSpec.length),
       );
     }
-    return spec.files?.first;
+    return notNull(spec.files?.first, () => DriveApiException(spec));
   }
 
-  Future<drive.File?> getOrCreateFilesFolder() async {
+  Future<drive.File> getOrCreateFilesFolder() async {
     final api = await driveApi;
-    if (api == null) return null;
 
     final fileFolder = await api.files.list(
       spaces: appDataFolder,
@@ -93,15 +94,14 @@ class DriveRepository {
         parents: [appDataFolder],
       ));
     }
-    return fileFolder.files?.first;
+    return notNull(
+        fileFolder.files?.first, () => DriveApiException(fileFolder));
   }
 
   Future<bool> downloadSpec(File spec) async {
     final api = await driveApi;
-    if (api == null) return false;
 
     final remoteSpec = await getOrCreateSpec();
-    if (remoteSpec == null) return false;
 
     final remoteSpecSource = await api.files.get(
       remoteSpec.id!,
@@ -114,12 +114,10 @@ class DriveRepository {
     return true;
   }
 
-  Future<bool> downloadFiles(Directory directory) async {
+  Future<void> downloadFiles(Directory directory) async {
     final api = await driveApi;
-    if (api == null) return false;
 
     final filesFolder = await getOrCreateFilesFolder();
-    if (filesFolder == null) return false;
 
     final remoteFiles = await api.files.list(
       spaces: appDataFolder,
@@ -139,15 +137,12 @@ class DriveRepository {
         localFile.writeAsBytesSync(bytes);
       }
     }
-    return true;
   }
 
-  Future<bool> uploadSpec(File spec) async {
+  Future<void> uploadSpec(File spec) async {
     final api = await driveApi;
-    if (api == null) return false;
 
     final oldSpec = await getOrCreateSpec();
-    if (oldSpec == null) return false;
 
     final bytes = spec.readAsBytesSync().toList();
 
@@ -162,15 +157,12 @@ class DriveRepository {
         bytes.length,
       ),
     );
-    return true;
   }
 
-  Future<bool> uploadFiles(List<File> files) async {
+  Future<void> uploadFiles(List<File> files) async {
     final api = await driveApi;
-    if (api == null) return false;
 
     final filesFolder = await getOrCreateFilesFolder();
-    if (filesFolder == null) return false;
 
     for (final localFile in files) {
       final bytes = localFile.readAsBytesSync().toList();
@@ -186,15 +178,12 @@ class DriveRepository {
         ),
       );
     }
-    return true;
   }
 
-  Future<bool> deleteFile(File file) async {
+  Future<void> deleteFile(File file) async {
     final api = await driveApi;
-    if (api == null) return false;
 
     final filesFolder = await getOrCreateFilesFolder();
-    if (filesFolder == null) return false;
 
     final remoteFiles = await api.files.list(
       spaces: appDataFolder,
@@ -204,15 +193,28 @@ class DriveRepository {
     for (final remoteFile in remoteFiles.files!) {
       await api.files.delete(remoteFile.id!);
     }
-    return true;
   }
 
-  Future<bool> deleteFiles(List<File> files) async {
+  Future<void> cleanupFiles(List<File> files) async {
     final api = await driveApi;
-    if (api == null) return false;
 
     final filesFolder = await getOrCreateFilesFolder();
-    if (filesFolder == null) return false;
+
+    final remoteFiles = await api.files.list(
+      spaces: appDataFolder,
+      q: "'${filesFolder.id}' in parents and mimeType != '$folderMimeType'",
+      $fields: defaultFileFields,
+    );
+
+    Future.wait(remoteFiles.files!
+        .where((f) => !files.containsFilename(f.name!))
+        .map((f) => api.files.delete(f.id!)));
+  }
+
+  Future<void> deleteFiles(List<File> files) async {
+    final api = await driveApi;
+
+    final filesFolder = await getOrCreateFilesFolder();
 
     for (final localFile in files) {
       final remoteFiles = await api.files.list(
@@ -224,13 +226,10 @@ class DriveRepository {
         await api.files.delete(remoteFile.id!);
       }
     }
-
-    return true;
   }
 
-  Future<bool> deleteAll() async {
+  Future<void> deleteAll() async {
     final api = await driveApi;
-    if (api == null) return false;
 
     final remoteFiles = await api.files.list(
       spaces: appDataFolder,
@@ -239,7 +238,6 @@ class DriveRepository {
     for (final remoteFile in remoteFiles.files!) {
       await api.files.delete(remoteFile.id!);
     }
-    return true;
   }
 }
 
@@ -254,4 +252,20 @@ class GoogleAuthClient extends http.BaseClient {
     request.headers.addAll(_headers);
     return _client.send(request);
   }
+}
+
+class DriveException implements Exception {
+  String message;
+
+  DriveException(this.message);
+}
+
+class DriveNotLoggedInException extends DriveException {
+  DriveNotLoggedInException() : super('User not logged in');
+}
+
+class DriveApiException extends DriveException {
+  final dynamic data;
+
+  DriveApiException([this.data]) : super('Api error');
 }

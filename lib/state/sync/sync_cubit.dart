@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:file_flow/core/optimistic_call.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
 import 'package:googleapis/drive/v3.dart' as drive;
@@ -43,17 +44,20 @@ class SyncCubit extends Cubit<SyncState> {
       final onlineDocs = await syncRepository.loadOnline();
       emit(SyncLoadedSyncing(onlineDocs));
 
-      final (newDocs, uploadedDocs) =
+      final optimisticCall =
           await syncRepository.addDocument(onlineDocs, document);
-      emit(SyncLoadedSyncing(newDocs));
-      emit(SyncLoaded(await uploadedDocs));
-    } on drive.DetailedApiRequestError catch (e) {
-      print(e.jsonResponse);
-      rethrow;
+      emit(SyncLoadedSyncing(optimisticCall.getValue()));
+      final (docs, state) = await optimisticCall.getResult();
+      if (state == OptimisticResultState.success) {
+        emit(SyncLoaded(docs));
+      } else {
+        emit(SyncLoadedOffline(docs));
+      }
     } catch (e, s) {
       print(e);
       print(s);
-      emit(SyncLoadedOffline(lastState is SyncLoaded ? lastState.documents : []));
+      emit(SyncLoadedOffline(
+          lastState is SyncLoaded ? lastState.documents : []));
     }
   }
 
@@ -65,17 +69,20 @@ class SyncCubit extends Cubit<SyncState> {
       final onlineDocs = await syncRepository.loadOnline();
       emit(SyncLoadedSyncing(onlineDocs));
 
-      final (newDocs, uploadedDocs) = await syncRepository.deleteDocument(
-          onlineDocs, onlineDocs.firstWhere((d) => d.uuid == document.uuid));
-      emit(SyncLoadedSyncing(newDocs));
-      emit(SyncLoaded(await uploadedDocs));
-    } on drive.DetailedApiRequestError catch (e) {
-      print(e.jsonResponse);
-      rethrow;
+      final optimisticCall = await syncRepository.deleteDocument(
+          onlineDocs, onlineDocs.getUuid(document.uuid)!);
+      emit(SyncLoadedSyncing(optimisticCall.getValue()));
+      final (docs, state) = await optimisticCall.getResult();
+      if (state == OptimisticResultState.success) {
+        emit(SyncLoaded(docs));
+      } else {
+        emit(SyncLoadedOffline(docs));
+      }
     } catch (e, s) {
       print(e);
       print(s);
-      emit(SyncLoadedOffline(lastState is SyncLoaded ? lastState.documents : []));
+      emit(SyncLoadedOffline(
+          lastState is SyncLoaded ? lastState.documents : []));
     }
   }
 

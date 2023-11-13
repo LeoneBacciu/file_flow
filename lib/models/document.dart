@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:equatable/equatable.dart';
@@ -51,6 +52,22 @@ class Document extends Equatable {
     this.content,
   });
 
+  Document edit({
+    String? uuid,
+    DocumentCategory? category,
+    String? name,
+    DateTime? lastModified,
+    List<File>? files,
+    DocumentContent? content,
+  }) =>
+      Document.uuid(
+        uuid: uuid ?? this.uuid,
+        category: category ?? this.category,
+        name: name ?? this.name,
+        lastModified: lastModified ?? this.lastModified,
+        files: files ?? [...this.files],
+      );
+
   File get preview => files.first;
 
   Document.fromJson(Map<String, dynamic> json, File Function(String) fileHandle)
@@ -81,6 +98,12 @@ class Document extends Equatable {
   @override
   List<Object?> get props =>
       [uuid, category, name, lastModified, files, content];
+
+  static List<Document> deserialize(
+          String data, File Function(String) fileHandler) =>
+      List.from(json.decode(data))
+          .map((d) => Document.fromJson(d, fileHandler))
+          .toList();
 }
 
 class DocumentContent extends Equatable {
@@ -109,4 +132,43 @@ class DocumentContent extends Equatable {
 
   @override
   List<Object?> get props => [date, amount, urls];
+}
+
+extension DocumentsExtension on List<Document> {
+  List<File> getFiles() => expand((d) => d.files).toList();
+
+  Document? getUuid(String uuid) =>
+      cast<Document?>().firstWhere((d) => d!.uuid == uuid, orElse: () => null);
+
+  void merge(List<Document> other) {
+    for (final od in other) {
+      final conflict = getUuid(od.uuid);
+      if (conflict == null || conflict.lastModified.isAfter(od.lastModified)) {
+        add(od);
+      }
+    }
+  }
+
+  void replace(Document document) {
+    removeWhere((d) => d.uuid == document.uuid);
+    add(document);
+  }
+
+  String serialize() => json.encode(map((d) => d.toJson()).toList());
+
+  List<Document> sorted(int Function(Document a, Document b) compare) {
+    sort(compare);
+    return this;
+  }
+}
+
+extension DocumentsFileExtension on List<File> {
+  bool containsPath(String path) =>
+      cast<File?>().firstWhere((f) => f!.path == path, orElse: () => null) !=
+      null;
+
+  bool containsFilename(String name) =>
+      cast<File?>()
+          .firstWhere((f) => basename(f!.path) == name, orElse: () => null) !=
+      null;
 }
