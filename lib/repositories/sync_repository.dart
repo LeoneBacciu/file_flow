@@ -1,10 +1,10 @@
 import 'dart:io';
 
+import 'package:file_flow/core/functions.dart';
 import 'package:file_flow/core/optimistic_call.dart';
 import 'package:file_flow/models/document.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:uuid/uuid.dart';
 
 import 'drive_repository.dart';
 
@@ -46,8 +46,9 @@ class SyncRepository {
   Future<List<File>> copyFiles(List<File> files) async {
     final fileDir = await getOrCreateFilesDirectory();
     return files
-        .map((e) => e.copySync(
-            '${fileDir.path}/${const Uuid().v4()}.jpeg'))
+        .map((e) => e.parent.path == fileDir.path
+            ? e
+            : e.copySync('${fileDir.path}/${uuid4()}.jpeg'))
         .toList();
   }
 
@@ -63,8 +64,8 @@ class SyncRepository {
   Future<DocumentList> loadOffline() async {
     final spec = await getOrCreateSpec();
     final files = await getFilesMap();
-    final docs =
-        Document.deserialize(spec.readAsStringSync(), (f) => files[f]!).frozen();
+    final docs = Document.deserialize(spec.readAsStringSync(), (f) => files[f]!)
+        .frozen();
     cleanupFiles(docs.getFiles());
     return docs;
   }

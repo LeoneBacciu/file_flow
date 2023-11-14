@@ -4,7 +4,7 @@ abstract class SyncState extends Equatable {
   const SyncState();
 }
 
-class SyncInitial extends SyncState {
+class SyncUnsynced extends SyncState {
   @override
   List<Object> get props => [];
 }

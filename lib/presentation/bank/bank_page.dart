@@ -20,7 +20,7 @@ class _BankPageState extends State<BankPage> {
     return Scaffold(
       appBar: commonAppBar('Finanze'),
       body: const Center(
-        child: Text('Finanze'),
+        child: Text('Available soon!'),
       ),
       floatingActionButton: commonFloatingActionButton(
         context,

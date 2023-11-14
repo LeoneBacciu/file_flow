@@ -13,6 +13,7 @@ class DocumentSearchBar extends StatefulWidget {
 }
 
 class _DocumentSearchBarState extends State<DocumentSearchBar> {
+  // ignore: unused_field
   late SearchQuery _query = SearchQuery('', widget.category);
 
   @override

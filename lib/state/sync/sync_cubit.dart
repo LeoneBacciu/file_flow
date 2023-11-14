@@ -2,7 +2,7 @@ import 'package:equatable/equatable.dart';
 import 'package:file_flow/core/optimistic_call.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
-import 'package:googleapis/drive/v3.dart' as drive;
+import 'dart:developer' as dev;
 
 import '../../models/document.dart';
 import '../../repositories/sync_repository.dart';
@@ -15,7 +15,7 @@ class SyncCubit extends Cubit<SyncState> {
   final SyncRepository syncRepository;
   final DocumentList emptyList = <Document>[].frozen();
 
-  SyncCubit({required this.syncRepository}) : super(SyncInitial());
+  SyncCubit({required this.syncRepository}) : super(SyncUnsynced());
 
   void load() async {
     final lastState = state;
@@ -28,12 +28,9 @@ class SyncCubit extends Cubit<SyncState> {
     try {
       final onlineDocs = await syncRepository.loadOnline();
       emit(SyncLoaded(onlineDocs));
-    } on drive.DetailedApiRequestError catch (e) {
-      print(e.jsonResponse);
-      rethrow;
     } catch (e, s) {
-      print(e);
-      print(s);
+      dev.log(e.toString());
+      dev.log(s.toString());
       emit(SyncLoadedOffline(offlineDocs));
     }
   }
@@ -57,8 +54,8 @@ class SyncCubit extends Cubit<SyncState> {
         emit(SyncLoadedOffline(docs));
       }
     } catch (e, s) {
-      print(e);
-      print(s);
+      dev.log(e.toString());
+      dev.log(s.toString());
       emit(SyncLoadedOffline(
           lastState is SyncLoaded ? lastState.documents : emptyList));
     }
@@ -83,8 +80,8 @@ class SyncCubit extends Cubit<SyncState> {
         emit(SyncLoadedOffline(docs));
       }
     } catch (e, s) {
-      print(e);
-      print(s);
+      dev.log(e.toString());
+      dev.log(s.toString());
       emit(SyncLoadedOffline(
           lastState is SyncLoaded ? lastState.documents : emptyList));
     }
@@ -109,8 +106,8 @@ class SyncCubit extends Cubit<SyncState> {
         emit(SyncLoadedOffline(docs));
       }
     } catch (e, s) {
-      print(e);
-      print(s);
+      dev.log(e.toString());
+      dev.log(s.toString());
       emit(SyncLoadedOffline(
           lastState is SyncLoaded ? lastState.documents : emptyList));
     }
@@ -119,12 +116,12 @@ class SyncCubit extends Cubit<SyncState> {
   @override
   void onChange(Change<SyncState> change) {
     super.onChange(change);
-    print(change.toString());
+    dev.log(change.toString());
   }
 
   @override
   void onError(Object error, StackTrace stackTrace) {
     super.onError(error, stackTrace);
-    print(error.toString());
+    dev.log(error.toString());
   }
 }

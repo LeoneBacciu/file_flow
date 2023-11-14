@@ -1,3 +1,5 @@
+import 'package:uuid/uuid.dart';
+
 extension NullApplyExtension<T, R> on T? {
   R? apply(R Function(T) f) {
     final cp = this;
@@ -16,3 +18,5 @@ extension StringExtension on String {
 }
 
 T id<T>(T v) => v;
+
+String uuid4() => const Uuid().v4();

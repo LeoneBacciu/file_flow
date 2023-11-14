@@ -3,22 +3,26 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:equatable/equatable.dart';
+import 'package:file_flow/core/functions.dart';
+import 'package:flutter/material.dart';
 import 'package:path/path.dart';
-import 'package:uuid/uuid.dart';
 
 typedef DocumentListEditable = List<Document>;
 typedef DocumentList = UnmodifiableListView<Document>;
 
 enum DocumentCategory {
-  card('card'),
-  bill('bill', true),
-  bank('bank', true),
-  other('other');
+  card('card', 'Carta', Icons.info),
+  bill('bill', 'Bolletta', Icons.home, true),
+  bank('bank', 'Banca', Icons.attach_money, true),
+  other('other', 'Altro', Icons.description);
 
   final String jsonValue;
+  final String displayName;
+  final IconData iconData;
   final bool parsing;
 
-  const DocumentCategory(this.jsonValue, [this.parsing = false]);
+  const DocumentCategory(this.jsonValue, this.displayName, this.iconData,
+      [this.parsing = false]);
 
   factory DocumentCategory.fromJson(String json) =>
       values.firstWhere((e) => e.jsonValue == json);
@@ -45,7 +49,7 @@ class Document extends Equatable {
     required this.lastModified,
     required this.files,
     this.content,
-  }) : uuid = const Uuid().v4();
+  }) : uuid = uuid4();
 
   const Document.uuid({
     required this.uuid,

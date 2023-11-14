@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:file_flow/core/errors.dart';
 import 'package:file_flow/models/document.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:googleapis/drive/v3.dart' as drive;
 import 'package:http/http.dart' as http;
@@ -31,30 +30,9 @@ class DriveRepository {
     return driveApi;
   }
 
-  Future<void> signIn() async {
-    final googleUser = await user;
+  Future<GoogleSignInAccount?> signIn() => googleSignIn.signIn();
 
-    try {
-      if (googleUser != null) {
-        final googleAuth = await googleUser.authentication;
-        final credential = GoogleAuthProvider.credential(
-          accessToken: googleAuth.accessToken,
-          idToken: googleAuth.idToken,
-        );
-        final UserCredential loginUser =
-            await FirebaseAuth.instance.signInWithCredential(credential);
-
-        assert(loginUser.user?.uid == FirebaseAuth.instance.currentUser?.uid);
-      }
-    } catch (e) {
-      print(e);
-    }
-  }
-
-  Future<void> signOut() async {
-    await FirebaseAuth.instance.signOut();
-    await googleSignIn.signOut();
-  }
+  Future<void> signOut() => googleSignIn.signOut();
 
   Future<drive.File> getOrCreateSpec() async {
     final api = await driveApi;
@@ -164,7 +142,16 @@ class DriveRepository {
 
     final filesFolder = await getOrCreateFilesFolder();
 
+    final remoteFiles = await api.files.list(
+      spaces: appDataFolder,
+      q: "'${filesFolder.id}' in parents and mimeType != '$folderMimeType'",
+      $fields: defaultFileFields,
+    );
+    final filenames = remoteFiles.files?.map((e) => e.name!).toList() ?? [];
+
     for (final localFile in files) {
+      if (filenames.contains(basename(localFile.path))) continue;
+
       final bytes = localFile.readAsBytesSync().toList();
 
       await api.files.create(

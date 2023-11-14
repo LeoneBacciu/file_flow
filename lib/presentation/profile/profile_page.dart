@@ -12,6 +12,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 
+import '../../core/components/separator.dart';
+
 class ProfilePage extends StatefulIndexedPage {
   const ProfilePage({
     super.key,
@@ -53,12 +55,7 @@ class _ProfilePageState extends SearchQueryState<ProfilePage> {
                             leading: CircleAvatar(
                               backgroundImage: FileImage(d.preview),
                             ),
-                            trailing: IconButton(
-                              onPressed: () =>
-                                  BlocProvider.of<SyncCubit>(context)
-                                      .deleteDocument(d),
-                              icon: const Icon(Icons.delete),
-                            ),
+                            trailing: Icon(d.category.iconData),
                             title: Text(d.name),
                             subtitle: Text(DateFormat('HH:mm - dd/MM/yyyy')
                                 .format(d.lastModified)),
@@ -72,6 +69,7 @@ class _ProfilePageState extends SearchQueryState<ProfilePage> {
                         .toList()
                     : [],
               ),
+              const SliverToBoxAdapter(child: Separator.height(100))
             ],
           );
         },

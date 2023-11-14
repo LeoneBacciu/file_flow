@@ -20,7 +20,7 @@ class _BillsPageState extends State<BillsPage> {
     return Scaffold(
       appBar: commonAppBar('Bollette'),
       body: const Center(
-        child: Text('Bollette'),
+        child: Text('Available soon!'),
       ),
       floatingActionButton: commonFloatingActionButton(
         context,

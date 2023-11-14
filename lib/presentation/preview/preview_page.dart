@@ -2,7 +2,10 @@ import 'package:file_flow/models/document.dart';
 import 'package:file_flow/presentation/edit/edit_page.dart';
 import 'package:file_flow/presentation/preview/components/images_preview.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:share_plus/share_plus.dart';
+
+import '../../state/sync/sync_cubit.dart';
 
 class PreviewPage extends StatefulWidget {
   final Document document;
@@ -28,17 +31,18 @@ class _PreviewPageState extends State<PreviewPage> {
             ),
             icon: const Icon(Icons.edit),
           ),
+          IconButton(
+            onPressed: () {
+              BlocProvider.of<SyncCubit>(context)
+                .deleteDocument(widget.document);
+              Navigator.of(context).pop();
+            },
+            icon: const Icon(Icons.delete),
+          )
         ],
       ),
       body: SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              ImagesPreview(images: widget.document.files),
-            ],
-          ),
-        ),
+        child: ImagesPreview(images: widget.document.files),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => Share.shareXFiles(
