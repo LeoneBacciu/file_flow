@@ -42,7 +42,7 @@ class _CardsPageState extends SearchQueryState<CardsPage> {
                 children: (state is SyncLoaded)
                     ? state.documents
                         .where(queryFilter)
-                        .map((d) => CardsCard(title: d.name, image: d.preview))
+                        .map((d) => CardsCard(document: d))
                         .toList()
                     : [],
               ),
@@ -52,7 +52,7 @@ class _CardsPageState extends SearchQueryState<CardsPage> {
       ),
       floatingActionButton: commonFloatingActionButton(
         context,
-        'ciao2',
+        DocumentCategory.card,
         () => widget.onNewDocument!(DocumentCategory.card),
       ),
       bottomNavigationBar: commonNavigationBar(

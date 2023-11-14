@@ -19,7 +19,8 @@ class SyncCubit extends Cubit<SyncState> {
 
   void load() async {
     final lastState = state;
-    emit(SyncLoadedSyncing(lastState is SyncLoaded ? lastState.documents : emptyList));
+    emit(SyncLoadedSyncing(
+        lastState is SyncLoaded ? lastState.documents : emptyList));
 
     final offlineDocs = await syncRepository.loadOffline();
     emit(SyncLoadedSyncing(offlineDocs));
@@ -39,7 +40,8 @@ class SyncCubit extends Cubit<SyncState> {
 
   void addDocument(Document document) async {
     final lastState = state;
-    emit(SyncLoadedSyncing(lastState is SyncLoaded ? lastState.documents : emptyList));
+    emit(SyncLoadedSyncing(
+        lastState is SyncLoaded ? lastState.documents : emptyList));
 
     try {
       final onlineDocs = await syncRepository.loadOnline();
@@ -62,9 +64,36 @@ class SyncCubit extends Cubit<SyncState> {
     }
   }
 
+  void editDocument(Document document) async {
+    final lastState = state;
+    emit(SyncLoadedSyncing(
+        lastState is SyncLoaded ? lastState.documents : emptyList));
+
+    try {
+      final onlineDocs = await syncRepository.loadOnline();
+      emit(SyncLoadedSyncing(onlineDocs));
+
+      final optimisticCall =
+          await syncRepository.editDocument(onlineDocs, document);
+      emit(SyncLoadedSyncing(optimisticCall.getValue()));
+      final (docs, state) = await optimisticCall.getResult();
+      if (state == OptimisticResultState.success) {
+        emit(SyncLoaded(docs));
+      } else {
+        emit(SyncLoadedOffline(docs));
+      }
+    } catch (e, s) {
+      print(e);
+      print(s);
+      emit(SyncLoadedOffline(
+          lastState is SyncLoaded ? lastState.documents : emptyList));
+    }
+  }
+
   void deleteDocument(Document document) async {
     final lastState = state;
-    emit(SyncLoadedSyncing(lastState is SyncLoaded ? lastState.documents : emptyList));
+    emit(SyncLoadedSyncing(
+        lastState is SyncLoaded ? lastState.documents : emptyList));
 
     try {
       final onlineDocs = await syncRepository.loadOnline();

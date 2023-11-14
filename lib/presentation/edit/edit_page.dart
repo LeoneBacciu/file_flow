@@ -1,8 +1,10 @@
 import 'package:file_flow/models/document.dart';
 import 'package:file_flow/presentation/edit/components/images_selector.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../core/components/separator.dart';
+import '../../state/sync/sync_cubit.dart';
 import 'components/content_form.dart';
 
 class EditPage extends StatefulWidget {
@@ -19,8 +21,6 @@ class _EditPageState extends State<EditPage> {
 
   @override
   Widget build(BuildContext context) {
-    print('---------');
-    print(document.content);
     return Scaffold(
       appBar: AppBar(
         title: Text('Edit ${document.name}'),
@@ -62,6 +62,15 @@ class _EditPageState extends State<EditPage> {
             ],
           ),
         ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          BlocProvider.of<SyncCubit>(context).editDocument(
+            document.edit(lastModified: DateTime.now()),
+          );
+          Navigator.of(context).pop();
+        },
+        child: const Icon(Icons.save),
       ),
     );
   }

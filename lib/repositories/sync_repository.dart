@@ -106,7 +106,7 @@ class SyncRepository {
     );
   }
 
-  Future<OptimisticCall<DocumentList>> updateDocument(
+  Future<OptimisticCall<DocumentList>> editDocument(
       DocumentList documents, Document document) async {
     final spec = await getOrCreateSpec();
 

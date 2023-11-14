@@ -21,7 +21,7 @@ class _PreviewPageState extends State<PreviewPage> {
         title: Text(widget.document.name),
         actions: [
           IconButton(
-            onPressed: () => Navigator.of(context).push(
+            onPressed: () => Navigator.of(context).pushReplacement(
               MaterialPageRoute(
                 builder: (context) => EditPage(document: widget.document),
               ),

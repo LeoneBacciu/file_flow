@@ -18,7 +18,10 @@ class ImagesPreview extends StatelessWidget {
           clipBehavior: Clip.hardEdge,
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-          child: Image.file(images[index]),
+          child: Hero(
+            tag: images[index].path,
+            child: Image.file(images[index]),
+          ),
         ),
       ),
     );

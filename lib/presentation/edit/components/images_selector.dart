@@ -72,7 +72,9 @@ class _ImagesSelectorState extends State<ImagesSelector> {
                 child: Stack(
                   children: [
                     Positioned.fill(
-                      child: Image.file(images[index]),
+                      child: Hero(
+                          tag: images[index].path,
+                          child: Image.file(images[index])),
                     ),
                     Positioned(
                       bottom: 10,
