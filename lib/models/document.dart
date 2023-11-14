@@ -1,9 +1,13 @@
+import 'dart:collection';
 import 'dart:convert';
 import 'dart:io';
 
 import 'package:equatable/equatable.dart';
 import 'package:path/path.dart';
 import 'package:uuid/uuid.dart';
+
+typedef DocumentListEditable = List<Document>;
+typedef DocumentList = UnmodifiableListView<Document>;
 
 enum DocumentCategory {
   card('card'),
@@ -99,7 +103,7 @@ class Document extends Equatable {
   List<Object?> get props =>
       [uuid, category, name, lastModified, files, content];
 
-  static List<Document> deserialize(
+  static DocumentListEditable deserialize(
           String data, File Function(String) fileHandler) =>
       List.from(json.decode(data))
           .map((d) => Document.fromJson(d, fileHandler))
@@ -134,13 +138,13 @@ class DocumentContent extends Equatable {
   List<Object?> get props => [date, amount, urls];
 }
 
-extension DocumentsExtension on List<Document> {
+extension DocumentListExtension on DocumentListEditable {
   List<File> getFiles() => expand((d) => d.files).toList();
 
   Document? getUuid(String uuid) =>
       cast<Document?>().firstWhere((d) => d!.uuid == uuid, orElse: () => null);
 
-  void merge(List<Document> other) {
+  void merge(DocumentListEditable other) {
     for (final od in other) {
       final conflict = getUuid(od.uuid);
       if (conflict == null || conflict.lastModified.isAfter(od.lastModified)) {
@@ -149,14 +153,21 @@ extension DocumentsExtension on List<Document> {
     }
   }
 
-  void replaceUuid(Document document) => this[indexWhere((d) => d.uuid == document.uuid)] = document;
+  void replaceUuid(Document document) =>
+      this[indexWhere((d) => d.uuid == document.uuid)] = document;
 
   String serialize() => json.encode(map((d) => d.toJson()).toList());
 
-  List<Document> sorted(int Function(Document a, Document b) compare) {
+  DocumentListEditable sorted(int Function(Document a, Document b) compare) {
     sort(compare);
     return this;
   }
+
+  DocumentList frozen() => UnmodifiableListView(this);
+}
+
+extension DocumentListUExtension on DocumentList {
+  DocumentListEditable unfrozen() => toList();
 }
 
 extension DocumentsFileExtension on List<File> {

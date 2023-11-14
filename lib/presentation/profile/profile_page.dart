@@ -45,6 +45,7 @@ class _ProfilePageState extends SearchQueryState<ProfilePage> {
               SliverList.list(
                 children: (state is SyncLoaded)
                     ? state.documents
+                        .unfrozen()
                         .sorted(querySort)
                         .where(queryFilter)
                         .map(

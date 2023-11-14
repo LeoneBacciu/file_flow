@@ -13,12 +13,13 @@ part 'sync_provider.dart';
 
 class SyncCubit extends Cubit<SyncState> {
   final SyncRepository syncRepository;
+  final DocumentList emptyList = <Document>[].frozen();
 
   SyncCubit({required this.syncRepository}) : super(SyncInitial());
 
   void load() async {
     final lastState = state;
-    emit(SyncLoadedSyncing(lastState is SyncLoaded ? lastState.documents : []));
+    emit(SyncLoadedSyncing(lastState is SyncLoaded ? lastState.documents : emptyList));
 
     final offlineDocs = await syncRepository.loadOffline();
     emit(SyncLoadedSyncing(offlineDocs));
@@ -38,7 +39,7 @@ class SyncCubit extends Cubit<SyncState> {
 
   void addDocument(Document document) async {
     final lastState = state;
-    emit(SyncLoadedSyncing(lastState is SyncLoaded ? lastState.documents : []));
+    emit(SyncLoadedSyncing(lastState is SyncLoaded ? lastState.documents : emptyList));
 
     try {
       final onlineDocs = await syncRepository.loadOnline();
@@ -57,13 +58,13 @@ class SyncCubit extends Cubit<SyncState> {
       print(e);
       print(s);
       emit(SyncLoadedOffline(
-          lastState is SyncLoaded ? lastState.documents : []));
+          lastState is SyncLoaded ? lastState.documents : emptyList));
     }
   }
 
   void deleteDocument(Document document) async {
     final lastState = state;
-    emit(SyncLoadedSyncing(lastState is SyncLoaded ? lastState.documents : []));
+    emit(SyncLoadedSyncing(lastState is SyncLoaded ? lastState.documents : emptyList));
 
     try {
       final onlineDocs = await syncRepository.loadOnline();
@@ -82,7 +83,7 @@ class SyncCubit extends Cubit<SyncState> {
       print(e);
       print(s);
       emit(SyncLoadedOffline(
-          lastState is SyncLoaded ? lastState.documents : []));
+          lastState is SyncLoaded ? lastState.documents : emptyList));
     }
   }
 

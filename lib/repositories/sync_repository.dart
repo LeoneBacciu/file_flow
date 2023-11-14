@@ -60,16 +60,16 @@ class SyncRepository {
         .map((f) => f.delete()));
   }
 
-  Future<List<Document>> loadOffline() async {
+  Future<DocumentList> loadOffline() async {
     final spec = await getOrCreateSpec();
     final files = await getFilesMap();
     final docs =
-        Document.deserialize(spec.readAsStringSync(), (f) => files[f]!);
+        Document.deserialize(spec.readAsStringSync(), (f) => files[f]!).frozen();
     cleanupFiles(docs.getFiles());
     return docs;
   }
 
-  Future<List<Document>> loadOnline() async {
+  Future<DocumentList> loadOnline() async {
     final spec = await getOrCreateSpec();
     final filesDir = await getOrCreateFilesDirectory();
     await driveRepository.downloadSpec(spec);
@@ -79,8 +79,8 @@ class SyncRepository {
     return docs;
   }
 
-  Future<OptimisticCall<List<Document>>> addDocument(
-      List<Document> documents, Document document) async {
+  Future<OptimisticCall<DocumentList>> addDocument(
+      DocumentList documents, Document document) async {
     final spec = await getOrCreateSpec();
 
     final copiedFiles = await copyFiles(document.files);
@@ -88,7 +88,7 @@ class SyncRepository {
       ..clear()
       ..addAll(copiedFiles);
 
-    final documentsCopy = [...documents, document];
+    final documentsCopy = [...documents, document].frozen();
 
     spec.writeAsStringSync(documentsCopy.serialize());
 
@@ -106,8 +106,8 @@ class SyncRepository {
     );
   }
 
-  Future<OptimisticCall<List<Document>>> updateDocument(
-      List<Document> documents, Document document) async {
+  Future<OptimisticCall<DocumentList>> updateDocument(
+      DocumentList documents, Document document) async {
     final spec = await getOrCreateSpec();
 
     final copiedFiles = await copyFiles(document.files);
@@ -115,7 +115,7 @@ class SyncRepository {
       ..clear()
       ..addAll(copiedFiles);
 
-    final documentsCopy = [...documents]..replaceUuid(document);
+    final documentsCopy = ([...documents]..replaceUuid(document)).frozen();
 
     spec.writeAsStringSync(documentsCopy.serialize());
 
@@ -135,9 +135,9 @@ class SyncRepository {
     );
   }
 
-  Future<OptimisticCall<List<Document>>> deleteDocument(
-      List<Document> documents, Document document) async {
-    final documentsCopy = [...documents]..remove(document);
+  Future<OptimisticCall<DocumentList>> deleteDocument(
+      DocumentList documents, Document document) async {
+    final documentsCopy = ([...documents]..remove(document)).frozen();
 
     final spec = await getOrCreateSpec();
     spec.writeAsStringSync(documentsCopy.serialize());

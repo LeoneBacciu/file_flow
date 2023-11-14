@@ -10,7 +10,7 @@ class SyncInitial extends SyncState {
 }
 
 class SyncLoaded extends SyncState {
-  final List<Document> documents;
+  final DocumentList documents;
 
   const SyncLoaded(this.documents);
 
