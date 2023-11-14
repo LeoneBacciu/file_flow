@@ -6,8 +6,10 @@ import 'package:flutter/material.dart';
 
 class ImagesSelector extends StatefulWidget {
   final void Function(List<File>) onChange;
+  final List<File> initialValue;
 
-  const ImagesSelector({super.key, required this.onChange});
+  const ImagesSelector(
+      {super.key, required this.onChange, required this.initialValue});
 
   @override
   State<ImagesSelector> createState() => _ImagesSelectorState();
@@ -15,7 +17,7 @@ class ImagesSelector extends StatefulWidget {
 
 class _ImagesSelectorState extends State<ImagesSelector> {
   final PageController _controller = PageController(viewportFraction: 0.8);
-  late List<File> images = [];
+  late List<File> images = widget.initialValue;
 
   void update(VoidCallback fn) {
     setState(fn);

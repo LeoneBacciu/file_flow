@@ -1,4 +1,5 @@
 import 'package:file_flow/models/document.dart';
+import 'package:file_flow/presentation/edit/edit_page.dart';
 import 'package:file_flow/presentation/preview/components/images_preview.dart';
 import 'package:flutter/material.dart';
 import 'package:share_plus/share_plus.dart';
@@ -20,7 +21,11 @@ class _PreviewPageState extends State<PreviewPage> {
         title: Text(widget.document.name),
         actions: [
           IconButton(
-            onPressed: () {},
+            onPressed: () => Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) => EditPage(document: widget.document),
+              ),
+            ),
             icon: const Icon(Icons.edit),
           ),
         ],

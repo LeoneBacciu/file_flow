@@ -47,7 +47,7 @@ class _AddPageState extends State<AddPage> {
               const Separator.height(30),
               SizedBox(
                 width: 300,
-                child: TextField(
+                child: TextFormField(
                   onChanged: (s) => setState(() => name = s),
                   decoration: const InputDecoration(
                     border: OutlineInputBorder(),
@@ -86,6 +86,4 @@ class _AddPageState extends State<AddPage> {
       ),
     );
   }
-
-  void save() {}
 }

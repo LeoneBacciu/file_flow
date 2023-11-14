@@ -10,24 +10,32 @@ import '../../../core/components/separator.dart';
 
 class ContentForm extends StatefulWidget {
   final File source;
+  final DocumentContent initialValue;
   final void Function(DocumentContent) onChange;
 
-  const ContentForm({super.key, required this.source, required this.onChange});
+  const ContentForm({
+    super.key,
+    required this.source,
+    required this.onChange,
+    required this.initialValue,
+  });
 
   @override
   State<ContentForm> createState() => _ContentFormState();
 }
 
 class _ContentFormState extends State<ContentForm> {
-  TextEditingController dateInput = TextEditingController();
-  TextEditingController amountInput = TextEditingController();
-  DateTime? date;
+  late TextEditingController dateInput = TextEditingController(
+      text: DateFormat('dd/MM/yyyy').format(widget.initialValue.date));
+  late TextEditingController amountInput =
+      TextEditingController(text: widget.initialValue.amount.toString());
+  late DateTime date = widget.initialValue.date;
 
   void updateListener() {
-    if (date != null && amountInput.text.isNotEmpty) {
+    if (amountInput.text.isNotEmpty) {
       widget.onChange(
         DocumentContent(
-          date: date!,
+          date: date,
           amount: double.parse(amountInput.text),
           urls: const [],
         ),

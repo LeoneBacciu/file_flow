@@ -70,6 +70,7 @@ class Document extends Equatable {
         name: name ?? this.name,
         lastModified: lastModified ?? this.lastModified,
         files: files ?? [...this.files],
+        content: content ?? this.content,
       );
 
   File get preview => files.first;
