@@ -124,7 +124,7 @@ class SyncRepository {
       onSend: (d) => driveRepository.uploadFiles(copiedFiles).whenComplete(() =>
           driveRepository
               .uploadSpec(spec)
-              .then((value) => driveRepository.cleanupFiles(d.getFiles()))),
+              .whenComplete(() => driveRepository.cleanupFiles(d.getFiles()))),
       onSuccess: (d) => cleanupFiles(d.getFiles()),
       onError: (_) async {
         spec.writeAsStringSync(documents.serialize());

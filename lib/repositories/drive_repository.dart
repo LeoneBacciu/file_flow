@@ -102,19 +102,22 @@ class DriveRepository {
       q: "'${filesFolder.id}' in parents and mimeType != '$folderMimeType'",
       $fields: defaultFileFields,
     );
-    for (final remoteFile in remoteFiles.files!) {
-      final localFile = File('${directory.path}/${remoteFile.name}');
-      if (localFile.existsSync()) continue;
 
-      final remoteFileSource = await api.files.get(
-        remoteFile.id!,
-        downloadOptions: drive.DownloadOptions.fullMedia,
-      );
-      if (remoteFileSource is drive.Media) {
-        final bytes = await remoteFileSource.stream.expand((i) => i).toList();
-        localFile.writeAsBytesSync(bytes);
-      }
-    }
+    await Future.wait(remoteFiles.files!.map(
+      (remoteFile) async {
+        final localFile = File('${directory.path}/${remoteFile.name}');
+        if (localFile.existsSync()) return;
+
+        final remoteFileSource = await api.files.get(
+          remoteFile.id!,
+          downloadOptions: drive.DownloadOptions.fullMedia,
+        );
+        if (remoteFileSource is drive.Media) {
+          final bytes = await remoteFileSource.stream.expand((i) => i).toList();
+          localFile.writeAsBytesSync(bytes);
+        }
+      },
+    ));
   }
 
   Future<void> uploadSpec(File spec) async {
@@ -149,22 +152,24 @@ class DriveRepository {
     );
     final filenames = remoteFiles.files?.map((e) => e.name!).toList() ?? [];
 
-    for (final localFile in files) {
-      if (filenames.contains(basename(localFile.path))) continue;
+    await Future.wait(files.map(
+      (localFile) async {
+        if (filenames.contains(basename(localFile.path))) return;
 
-      final bytes = localFile.readAsBytesSync().toList();
+        final bytes = localFile.readAsBytesSync().toList();
 
-      await api.files.create(
-        drive.File(
-          name: basename(localFile.path),
-          parents: [filesFolder.id!],
-        ),
-        uploadMedia: drive.Media(
-          Future.value(bytes).asStream(),
-          bytes.length,
-        ),
-      );
-    }
+        await api.files.create(
+          drive.File(
+            name: basename(localFile.path),
+            parents: [filesFolder.id!],
+          ),
+          uploadMedia: drive.Media(
+            Future.value(bytes).asStream(),
+            bytes.length,
+          ),
+        );
+      },
+    ));
   }
 
   Future<void> deleteFile(File file) async {
@@ -177,9 +182,10 @@ class DriveRepository {
       q: "'${filesFolder.id}' in parents and name = '${basename(file.path)}' and mimeType != '$folderMimeType'",
       $fields: defaultFileFields,
     );
-    for (final remoteFile in remoteFiles.files!) {
-      await api.files.delete(remoteFile.id!);
-    }
+
+    await Future.wait(remoteFiles.files!.map(
+      (remoteFile) => api.files.delete(remoteFile.id!),
+    ));
   }
 
   Future<void> cleanupFiles(List<File> files) async {
@@ -209,9 +215,10 @@ class DriveRepository {
         q: "'${filesFolder.id}' in parents and name = '${basename(localFile.path)}' and mimeType != '$folderMimeType'",
         $fields: defaultFileFields,
       );
-      for (final remoteFile in remoteFiles.files!) {
-        await api.files.delete(remoteFile.id!);
-      }
+
+      await Future.wait(remoteFiles.files!.map(
+        (remoteFile) => api.files.delete(remoteFile.id!),
+      ));
     }
   }
 
@@ -222,9 +229,10 @@ class DriveRepository {
       spaces: appDataFolder,
       $fields: defaultFileFields,
     );
-    for (final remoteFile in remoteFiles.files!) {
-      await api.files.delete(remoteFile.id!);
-    }
+
+    await Future.wait(remoteFiles.files!.map(
+      (remoteFile) => api.files.delete(remoteFile.id!),
+    ));
   }
 }
 
