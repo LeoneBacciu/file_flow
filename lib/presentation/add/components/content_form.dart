@@ -1,12 +1,14 @@
 import 'dart:io';
+import 'dart:developer' as dev;
 
 import 'package:file_flow/models/document.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
-import 'package:intl/intl.dart';
+import 'package:google_mlkit_barcode_scanning/google_mlkit_barcode_scanning.dart';
 
 import '../../../core/components/separator.dart';
+import '../../../core/date_ui.dart';
 
 class ContentForm extends StatefulWidget {
   final File source;
@@ -21,15 +23,16 @@ class ContentForm extends StatefulWidget {
 class _ContentFormState extends State<ContentForm> {
   TextEditingController dateInput = TextEditingController();
   TextEditingController amountInput = TextEditingController();
-  DateTime? date;
+
+  final urls = <Uri>[];
 
   void updateListener() {
-    if (date != null && amountInput.text.isNotEmpty) {
+    if (dateInput.text.isNotEmpty && amountInput.text.isNotEmpty) {
       widget.onChange(
         DocumentContent(
-          date: date!,
+          date: DateUi.parse(dateInput.text),
           amount: double.parse(amountInput.text),
-          urls: const [],
+          urls: urls,
         ),
       );
     }
@@ -40,7 +43,7 @@ class _ContentFormState extends State<ContentForm> {
     super.initState();
     dateInput.addListener(updateListener);
     amountInput.addListener(updateListener);
-    readFile(widget.source);
+    extractData(widget.source);
   }
 
   @override
@@ -69,8 +72,7 @@ class _ContentFormState extends State<ContentForm> {
 
               setState(() {
                 if (pickedDate != null) {
-                  date = pickedDate;
-                  dateInput.text = DateFormat('dd/MM/yyyy').format(pickedDate);
+                  dateInput.text = DateUi.format(pickedDate);
                 }
               });
             },
@@ -98,48 +100,64 @@ class _ContentFormState extends State<ContentForm> {
     );
   }
 
-  Future<void> readFile(File file) async {
+  Future<void> extractData(File file) async {
+    final img = InputImage.fromFile(file);
+
     final textRecognizer = TextRecognizer(script: TextRecognitionScript.latin);
 
-    final img = InputImage.fromFile(file);
     final RecognizedText recognizedText =
         await textRecognizer.processImage(img);
 
     String text = recognizedText.text.toLowerCase();
 
     final dateRegex = RegExp(
-        r"(0[1-9]|1[012])[- /.](0[1-9]|[12][0-9]|3[01])[- /.](19|20)\d\d");
+        r"(0[1-9]|[12][0-9]|3[01])[- /.](0[1-9]|1[012])[- /.](19|20)\d\d");
 
-    final amountRegex = RegExp(r"(\d+\.?\d*)");
+    final amountRegex = RegExp(r"(\d+[.|,]\d\d)");
 
-    print(
-        'dates: ${dateRegex.allMatches(text).map((e) => text.substring(e.start, e.end))}');
-    print(
-        'amounts: ${amountRegex.allMatches(text).map((e) => text.substring(e.start, e.end))}');
+    // print(
+    //     'dates: ${dateRegex.allMatches(text).map((e) => text.substring(e.start, e.end))}');
+    // print(
+    //     'amounts: ${amountRegex.allMatches(text).map((e) => text.substring(e.start, e.end))}');
 
-    // for (TextBlock block in recognizedText.blocks) {
-    //   final rect = block.boundingBox;
-    //   final cornerPoints = block.cornerPoints;
-    //   final text = block.text;
-    //   final languages = block.recognizedLanguages;
-    //
-    //   var dateRegex = RegExp(
-    //       r"(0[1-9]|1[012])[- /.] (0[1-9]|[12][0-9]|3[01])[- /.] (19|20)\d\d",
-    //       caseSensitive: false);
-    //   List<String> results = [];
-    //
-    //   for (final line in block.lines) {
-    //     for (final word in line.elements) {
-    //       results.add(word.text.trim().toLowerCase());
-    //     }
-    //   }
+    final dateMatch = dateRegex.firstMatch(text);
+    final amountMatch = amountRegex.firstMatch(text);
 
-    // print(results);
-    //
-    // print(results.where((e) => dateRegex.hasMatch(e)));
-    // }
+    if (dateMatch != null) {
+      try {
+        dateInput.text = DateUi.format(
+            DateUi.parse(text.substring(dateMatch.start, dateMatch.end)));
+      } catch (e) {
+        dev.log('Wrong date format');
+      }
+    }
+
+    if (amountMatch != null) {
+      try {
+        amountInput.text =
+            double.parse(text.substring(amountMatch.start, amountMatch.end))
+                .toStringAsFixed(2);
+      } catch (e) {
+        dev.log('Wrong double format');
+      }
+    }
 
     textRecognizer.close();
+
+    final barcodeScanner = BarcodeScanner(formats: [BarcodeFormat.qrCode]);
+
+    final barcodes = await barcodeScanner.processImage(img);
+
+    for (Barcode barcode in barcodes) {
+      final BarcodeType type = barcode.type;
+
+      if (type == BarcodeType.url) {
+        final barcodeUrl = barcode.value as BarcodeUrl;
+        if (barcodeUrl.url != null) urls.add(Uri.parse(barcodeUrl.url!));
+      }
+    }
+
+    barcodeScanner.close();
   }
 
   @override

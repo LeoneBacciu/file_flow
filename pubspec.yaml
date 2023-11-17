@@ -33,16 +33,14 @@ dependencies:
 
   file_picker: ^6.1.1
   google_sign_in: ^6.1.6
-  flutter_secure_storage: ^9.0.0
   http: ^1.1.0
   path: ^1.8.3
   path_provider: ^2.1.1
-  firebase_core: ^2.22.0
-  firebase_auth: ^4.13.0
   googleapis: ^11.4.0
   googleapis_auth: ^1.4.1
   intl: ^0.18.1
   google_mlkit_text_recognition: ^0.11.0
+  google_mlkit_barcode_scanning: ^0.10.0
   wave: ^0.2.2
   equatable: ^2.0.5
   bloc: ^8.1.2

@@ -56,7 +56,10 @@ class _EditPageState extends State<EditPage> {
               ),
               const Separator.height(30),
               AnimatedSwitcher(
-                duration: const Duration(seconds: 2),
+                duration: const Duration(milliseconds: 500),
+                transitionBuilder:
+                    (Widget child, Animation<double> animation) =>
+                        ScaleTransition(scale: animation, child: child),
                 child: document.category.parsing && document.files.isNotEmpty
                     ? ContentForm(
                         initialValue: document.content!,

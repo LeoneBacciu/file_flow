@@ -17,8 +17,7 @@ class ImagesPreview extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
-      shrinkWrap: true,
+    return SliverList.builder(
       itemCount: images.length,
       itemBuilder: (context, index) => Center(
         child: InkWell(

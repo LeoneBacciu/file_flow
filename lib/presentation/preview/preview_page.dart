@@ -48,8 +48,31 @@ class _PreviewPageState extends State<PreviewPage> {
         ],
       ),
       body: SafeArea(
-        child: ImagesPreview(
-            heroRoute: widget.heroRoute, images: widget.document.files),
+        child: CustomScrollView(
+          slivers: [
+            if (widget.document.content != null)
+              SliverAppBar(
+                floating: true,
+                automaticallyImplyLeading: false,
+                flexibleSpace: Wrap(
+                  alignment: WrapAlignment.center,
+                  children: widget.document.content!.urls
+                      .map(
+                        (u) => ActionChip(
+                          avatar: const Icon(Icons.public),
+                          label: Text(u.host),
+                          onPressed: () => Share.shareUri(u),
+                        ),
+                      )
+                      .toList(),
+                ),
+              ),
+            ImagesPreview(
+              heroRoute: widget.heroRoute,
+              images: widget.document.files,
+            ),
+          ],
+        ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: FloatingActionButton(

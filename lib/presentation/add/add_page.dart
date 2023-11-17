@@ -57,7 +57,10 @@ class _AddPageState extends State<AddPage> {
               ),
               const Separator.height(30),
               AnimatedSwitcher(
-                duration: const Duration(seconds: 2),
+                duration: const Duration(milliseconds: 500),
+                transitionBuilder:
+                    (Widget child, Animation<double> animation) =>
+                        ScaleTransition(scale: animation, child: child),
                 child: category.parsing && images.isNotEmpty
                     ? ContentForm(
                         source: images.first,

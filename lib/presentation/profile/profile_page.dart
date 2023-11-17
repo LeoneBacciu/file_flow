@@ -78,7 +78,7 @@ class _ProfilePageState extends SearchQueryState<ProfilePage> {
                           .toList()
                       : [],
                 ),
-                const SliverToBoxAdapter(child: Separator.height(100))
+                const SliverToBoxAdapter(child: Separator.height(1000))
               ],
             ),
           );

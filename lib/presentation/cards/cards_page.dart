@@ -34,7 +34,6 @@ class _CardsPageState extends SearchQueryState<CardsPage> {
           builder: (context, state) {
             return CustomScrollView(
               slivers: [
-                // const SliverToBoxAdapter(child: SizedBox(height: 12)),
                 DocumentSearchBar(
                   onSearch: querySearch,
                   category: DocumentCategory.card,
