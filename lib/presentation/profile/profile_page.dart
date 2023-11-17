@@ -54,8 +54,12 @@ class _ProfilePageState extends SearchQueryState<ProfilePage> {
                           .where(queryFilter)
                           .map(
                             (d) => ListTile(
-                              leading: CircleAvatar(
-                                backgroundImage: FileImage(d.preview),
+                              leading: Hero(
+                                tag:
+                                    '${NavigationRoute.profile}-${d.preview.path}',
+                                child: CircleAvatar(
+                                  backgroundImage: FileImage(d.preview),
+                                ),
                               ),
                               trailing: Icon(d.category.iconData),
                               title: Text(d.name),
@@ -63,7 +67,10 @@ class _ProfilePageState extends SearchQueryState<ProfilePage> {
                                   .format(d.lastModified)),
                               onTap: () => Navigator.of(context).push(
                                 MaterialPageRoute(
-                                  builder: (context) => PreviewPage(document: d),
+                                  builder: (context) => PreviewPage(
+                                    heroRoute: NavigationRoute.profile,
+                                    document: d,
+                                  ),
                                 ),
                               ),
                             ),

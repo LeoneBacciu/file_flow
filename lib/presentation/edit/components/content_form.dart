@@ -28,7 +28,7 @@ class _ContentFormState extends State<ContentForm> {
   late TextEditingController dateInput = TextEditingController(
       text: DateFormat('dd/MM/yyyy').format(widget.initialValue.date));
   late TextEditingController amountInput =
-      TextEditingController(text: widget.initialValue.amount.toString());
+      TextEditingController(text: widget.initialValue.amount.toStringAsFixed(2));
   late DateTime date = widget.initialValue.date;
 
   void updateListener() {

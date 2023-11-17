@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:file_flow/core/components/common.dart';
 import 'package:file_flow/core/convert.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
@@ -8,8 +9,14 @@ class ImagesSelector extends StatefulWidget {
   final void Function(List<File>) onChange;
   final List<File> initialValue;
 
-  const ImagesSelector(
-      {super.key, required this.onChange, required this.initialValue});
+  final NavigationRoute heroRoute;
+
+  const ImagesSelector({
+    super.key,
+    required this.onChange,
+    required this.initialValue,
+    required this.heroRoute,
+  });
 
   @override
   State<ImagesSelector> createState() => _ImagesSelectorState();
@@ -73,8 +80,9 @@ class _ImagesSelectorState extends State<ImagesSelector> {
                   children: [
                     Positioned.fill(
                       child: Hero(
-                          tag: images[index].path,
-                          child: Image.file(images[index])),
+                        tag: '${widget.heroRoute}-${images[index].path}',
+                        child: Image.file(images[index]),
+                      ),
                     ),
                     Positioned(
                       bottom: 10,

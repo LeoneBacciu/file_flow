@@ -13,6 +13,11 @@ enum NavigationRoute {
 
   factory NavigationRoute.fromId(int id) =>
       values.firstWhere((e) => e.id == id);
+
+  @override
+  String toString() {
+    return 'route-$id';
+  }
 }
 
 NavigationBar commonNavigationBar(BuildContext context, NavigationRoute route,

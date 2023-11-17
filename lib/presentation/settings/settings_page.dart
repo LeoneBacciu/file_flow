@@ -30,7 +30,7 @@ class _SettingsPageState extends State<SettingsPage> {
               onPressed: () {
                 GetIt.instance<DriveRepository>().deleteAll();
               },
-              child: Text(
+              child: const Text(
                 'Reset Remote',
                 style: TextStyle(color: Colors.red),
               ),
@@ -39,7 +39,7 @@ class _SettingsPageState extends State<SettingsPage> {
               onPressed: () {
                 GetIt.instance<SyncRepository>().clearAll();
               },
-              child: Text('Reset Local'),
+              child: const Text('Reset Local'),
             ),
           ],
         ),

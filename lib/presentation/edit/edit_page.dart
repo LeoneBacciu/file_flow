@@ -1,3 +1,4 @@
+import 'package:file_flow/core/components/common.dart';
 import 'package:file_flow/models/document.dart';
 import 'package:file_flow/presentation/edit/components/images_selector.dart';
 import 'package:flutter/material.dart';
@@ -9,8 +10,13 @@ import 'components/content_form.dart';
 
 class EditPage extends StatefulWidget {
   final Document document;
+  final NavigationRoute heroRoute;
 
-  const EditPage({super.key, required this.document});
+  const EditPage({
+    super.key,
+    required this.document,
+    required this.heroRoute,
+  });
 
   @override
   State<EditPage> createState() => _EditPageState();
@@ -30,6 +36,7 @@ class _EditPageState extends State<EditPage> {
           child: Column(
             children: [
               ImagesSelector(
+                heroRoute: widget.heroRoute,
                 initialValue: document.files,
                 onChange: (fs) =>
                     setState(() => document = document.edit(files: fs)),
@@ -64,6 +71,7 @@ class _EditPageState extends State<EditPage> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
+        heroTag: widget.heroRoute,
         onPressed: () {
           BlocProvider.of<SyncCubit>(context).editDocument(
             document.edit(lastModified: DateTime.now()),

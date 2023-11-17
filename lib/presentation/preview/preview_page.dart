@@ -1,3 +1,4 @@
+import 'package:file_flow/core/components/common.dart';
 import 'package:file_flow/models/document.dart';
 import 'package:file_flow/presentation/edit/edit_page.dart';
 import 'package:file_flow/presentation/preview/components/images_preview.dart';
@@ -9,8 +10,10 @@ import '../../state/sync/sync_cubit.dart';
 
 class PreviewPage extends StatefulWidget {
   final Document document;
+  final NavigationRoute heroRoute;
 
-  const PreviewPage({super.key, required this.document});
+  const PreviewPage(
+      {super.key, required this.document, required this.heroRoute});
 
   @override
   State<PreviewPage> createState() => _PreviewPageState();
@@ -26,7 +29,10 @@ class _PreviewPageState extends State<PreviewPage> {
           IconButton(
             onPressed: () => Navigator.of(context).pushReplacement(
               MaterialPageRoute(
-                builder: (context) => EditPage(document: widget.document),
+                builder: (context) => EditPage(
+                  heroRoute: widget.heroRoute,
+                  document: widget.document,
+                ),
               ),
             ),
             icon: const Icon(Icons.edit),
@@ -34,7 +40,7 @@ class _PreviewPageState extends State<PreviewPage> {
           IconButton(
             onPressed: () {
               BlocProvider.of<SyncCubit>(context)
-                .deleteDocument(widget.document);
+                  .deleteDocument(widget.document);
               Navigator.of(context).pop();
             },
             icon: const Icon(Icons.delete),
@@ -42,9 +48,12 @@ class _PreviewPageState extends State<PreviewPage> {
         ],
       ),
       body: SafeArea(
-        child: ImagesPreview(images: widget.document.files),
+        child: ImagesPreview(
+            heroRoute: widget.heroRoute, images: widget.document.files),
       ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: FloatingActionButton(
+        heroTag: widget.heroRoute,
         onPressed: () => Share.shareXFiles(
           widget.document.files.map((f) => XFile(f.path)).toList(),
           subject: widget.document.name,

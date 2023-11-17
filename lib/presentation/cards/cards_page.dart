@@ -8,7 +8,7 @@ import 'package:file_flow/state/sync/sync_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import 'components/id_doc_card.dart';
+import 'components/cards_card.dart';
 
 class CardsPage extends StatefulIndexedPage {
   const CardsPage({
@@ -29,26 +29,29 @@ class _CardsPageState extends SearchQueryState<CardsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: BlocBuilder<SyncCubit, SyncState>(
-        builder: (context, state) {
-          return CustomScrollView(
-            slivers: [
-              const SliverToBoxAdapter(child: SizedBox(height: 12)),
-              DocumentSearchBar(
-                onSearch: querySearch,
-                category: DocumentCategory.card,
-              ),
-              SliverList.list(
-                children: (state is SyncLoaded)
-                    ? state.documents
-                        .where(queryFilter)
-                        .map((d) => CardsCard(document: d))
-                        .toList()
-                    : [],
-              ),
-            ],
-          );
-        },
+      body: SafeArea(
+        child: BlocBuilder<SyncCubit, SyncState>(
+          builder: (context, state) {
+            return CustomScrollView(
+              slivers: [
+                // const SliverToBoxAdapter(child: SizedBox(height: 12)),
+                DocumentSearchBar(
+                  onSearch: querySearch,
+                  category: DocumentCategory.card,
+                ),
+                SliverList.list(
+                  children: (state is SyncLoaded)
+                      ? state.documents
+                          .where(queryFilter)
+                          .map((d) => CardsCard(document: d))
+                          .toList()
+                      : [],
+                ),
+                const SliverToBoxAdapter(child: SizedBox(height: 1000)), //TODO: Remove
+              ],
+            );
+          },
+        ),
       ),
       floatingActionButton: commonFloatingActionButton(
         context,

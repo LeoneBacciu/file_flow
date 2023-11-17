@@ -25,7 +25,7 @@ class _DocumentSearchBarState extends State<DocumentSearchBar> {
       collapsedHeight: kToolbarHeight + 32,
       expandedHeight: kToolbarHeight + 32,
       flexibleSpace: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 32),
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
         child: SearchBar(
           onChanged: (text) =>
               widget.onSearch(_query = SearchQuery(text, widget.category)),

@@ -129,17 +129,26 @@ class _HomeStackState extends State<HomeStack> {
           return IndexedStack(
             index: currentRoute.id,
             children: [
-              CardsPage(
-                onRouteChange: onRouteChange,
-                onNewDocument: onNewDocument,
+              Offstage(
+                offstage: currentRoute.id != 0,
+                child: CardsPage(
+                  onRouteChange: onRouteChange,
+                  onNewDocument: onNewDocument,
+                ),
               ),
-              BillsPage(
-                onRouteChange: onRouteChange,
-                onNewDocument: onNewDocument,
+              Offstage(
+                offstage: currentRoute.id != 1,
+                child: BillsPage(
+                  onRouteChange: onRouteChange,
+                  onNewDocument: onNewDocument,
+                ),
               ),
-              ProfilePage(
-                onRouteChange: onRouteChange,
-                onNewDocument: onNewDocument,
+              Offstage(
+                offstage: currentRoute.id != 2,
+                child: ProfilePage(
+                  onRouteChange: onRouteChange,
+                  onNewDocument: onNewDocument,
+                ),
               ),
               BankPage(
                 onRouteChange: onRouteChange,

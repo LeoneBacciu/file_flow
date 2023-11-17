@@ -1,3 +1,4 @@
+import 'package:file_flow/core/components/common.dart';
 import 'package:file_flow/models/document.dart';
 import 'package:file_flow/presentation/preview/preview_page.dart';
 import 'package:flutter/material.dart';
@@ -17,7 +18,10 @@ class CardsCard extends StatelessWidget {
       child: InkWell(
         onTap: () => Navigator.of(context).push(
           MaterialPageRoute(
-            builder: (context) => PreviewPage(document: document),
+            builder: (context) => PreviewPage(
+              heroRoute: NavigationRoute.cards,
+              document: document,
+            ),
           ),
         ),
         child: Column(
@@ -25,8 +29,10 @@ class CardsCard extends StatelessWidget {
             AspectRatio(
               aspectRatio: 85.60 / 53.98,
               child: Hero(
-                tag: document.preview.path,
-                child: Image.file(document.preview, fit: BoxFit.cover),
+                tag: '${NavigationRoute.cards}-${document.preview.path}',
+                child: ClipRRect(
+                    borderRadius: BorderRadius.circular(20),
+                    child: Image.file(document.preview, fit: BoxFit.cover)),
               ),
             ),
             Padding(

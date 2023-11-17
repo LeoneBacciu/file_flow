@@ -4,6 +4,7 @@ import 'package:image/image.dart' as img;
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:printing/printing.dart';
+import 'package:http/http.dart' as http;
 
 class FilesConverter {
   static Future<List<File>> convertImage(File file) async {
@@ -34,4 +35,13 @@ class FilesConverter {
               (extension(f.path) == '.pdf') ? convertPdf(f) : convertImage(f)))
           .then((fs) => fs.expand((fs) => fs))
           .then((fs) => fs.toList());
+
+  static Future<File> convertUrlToFile(String url) async {
+    final Directory temp = await getTemporaryDirectory();
+    final response = await http.get(Uri.parse(url));
+    final image = img.decodeImage(response.bodyBytes)!;
+    return File('${temp.path}/${uuid4()}.png')
+      ..createSync()
+      ..writeAsBytesSync(img.encodeJpg(image));
+  }
 }

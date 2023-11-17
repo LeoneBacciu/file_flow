@@ -1,9 +1,11 @@
 import 'dart:math';
 
+import 'package:file_flow/core/convert.dart';
 import 'package:file_flow/presentation/profile/components/account_sheet.dart';
 import 'package:file_flow/state/user/user_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:wave/config.dart';
 import 'package:wave/wave.dart';
 
@@ -42,29 +44,30 @@ class ProfileOverview extends StatelessWidget {
             alignment: Alignment.bottomCenter,
             child: Padding(
               padding: const EdgeInsets.all(8.0),
-              child: ListView(
-                reverse: true,
-                physics: const NeverScrollableScrollPhysics(),
-                children: [
-                  Center(
-                    child: GestureDetector(
-                      onTap: () => showModalBottomSheet(
-                        context: context,
-                        builder: (context) => const AccountSheet(),
-                      ),
-                      child: Container(
-                        margin: const EdgeInsets.only(top: 8),
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                            color: Theme.of(context).colorScheme.primary,
-                            borderRadius: BorderRadius.circular(10),
-                            border: Border.all(
-                              color: Theme.of(context).colorScheme.onPrimary,
-                              width: 5,
-                            )),
-                        child: BlocBuilder<UserCubit, UserState>(
-                          builder: (context, state) {
-                            return Text(
+              child: BlocBuilder<UserCubit, UserState>(
+                builder: (context, state) {
+                  return ListView(
+                    reverse: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    children: [
+                      Center(
+                        child: GestureDetector(
+                          onTap: () => showModalBottomSheet(
+                            context: context,
+                            builder: (context) => const AccountSheet(),
+                          ),
+                          child: Container(
+                            margin: const EdgeInsets.only(top: 8),
+                            padding: const EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                                color: Theme.of(context).colorScheme.primary,
+                                borderRadius: BorderRadius.circular(10),
+                                border: Border.all(
+                                  color:
+                                      Theme.of(context).colorScheme.onPrimary,
+                                  width: 5,
+                                )),
+                            child: Text(
                               (state is UserSignedIn)
                                   ? state.account.displayName ??
                                       state.account.email
@@ -74,21 +77,35 @@ class ProfileOverview extends StatelessWidget {
                                 fontWeight: FontWeight.bold,
                                 color: Theme.of(context).colorScheme.onPrimary,
                               ),
-                            );
-                          },
+                            ),
+                          ),
                         ),
                       ),
-                    ),
-                  ),
-                  CircleAvatar(
-                    radius: 90,
-                    backgroundColor: Theme.of(context).colorScheme.onPrimary,
-                    child: const CircleAvatar(
-                      radius: 80,
-                      backgroundImage: AssetImage('assets/avatar.jpg'),
-                    ),
-                  ),
-                ],
+                      GestureDetector(
+                        onLongPress: () async {
+                          if (state is UserSignedIn) {
+                            final image = await FilesConverter.convertUrlToFile(
+                                state.account.photoUrl!);
+                            Share.shareXFiles([XFile(image.path)]);
+                          }
+                        },
+                        child: CircleAvatar(
+                          radius: 70,
+                          backgroundColor:
+                              Theme.of(context).colorScheme.onPrimary,
+                          child: (state is UserSignedIn &&
+                                  state.account.photoUrl != null)
+                              ? CircleAvatar(
+                                  radius: 60,
+                                  backgroundImage:
+                                      NetworkImage(state.account.photoUrl!),
+                                )
+                              : const Icon(Icons.person, size: 100),
+                        ),
+                      ),
+                    ],
+                  );
+                },
               ),
             ),
           )
