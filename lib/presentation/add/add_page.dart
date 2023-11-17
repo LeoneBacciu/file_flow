@@ -31,7 +31,7 @@ class _AddPageState extends State<AddPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Add ${translateCategory[category.jsonValue]!}'),
+        title: Text('Aggiungi ${translateCategory[category.jsonValue]!}'),
       ),
       body: SafeArea(
         child: SingleChildScrollView(

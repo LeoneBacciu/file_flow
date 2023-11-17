@@ -29,7 +29,7 @@ class _EditPageState extends State<EditPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Edit ${document.name}'),
+        title: Text('Modifica ${document.name}'),
       ),
       body: SafeArea(
         child: SingleChildScrollView(
