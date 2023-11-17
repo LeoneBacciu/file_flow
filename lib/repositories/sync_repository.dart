@@ -95,10 +95,9 @@ class SyncRepository {
 
     return OptimisticCall(
       value: documentsCopy,
-      onSend: (_) => Future.wait([
-        driveRepository.uploadSpec(spec),
-        driveRepository.uploadFiles(copiedFiles)
-      ]),
+      onSend: (_) => driveRepository
+          .uploadFiles(copiedFiles)
+          .whenComplete(() => driveRepository.uploadSpec(spec)),
       onError: (_) async {
         spec.writeAsStringSync(documents.serialize());
         await cleanupFiles(documents.getFiles());
@@ -122,12 +121,11 @@ class SyncRepository {
 
     return OptimisticCall(
       value: documentsCopy,
-      onSend: (d) => Future.wait([
-        driveRepository
-            .uploadSpec(spec)
-            .then((value) => driveRepository.cleanupFiles(d.getFiles())),
-        driveRepository.uploadFiles(copiedFiles)
-      ]),
+      onSend: (d) => driveRepository.uploadFiles(copiedFiles).whenComplete(() =>
+          driveRepository
+              .uploadSpec(spec)
+              .then((value) => driveRepository.cleanupFiles(d.getFiles()))),
+      onSuccess: (d) => cleanupFiles(d.getFiles()),
       onError: (_) async {
         spec.writeAsStringSync(documents.serialize());
         await cleanupFiles(documents.getFiles());
@@ -145,11 +143,10 @@ class SyncRepository {
 
     return OptimisticCall(
       value: documentsCopy,
-      onSend: (_) => Future.wait([
-        driveRepository.uploadSpec(spec),
-        driveRepository.deleteFiles(document.files),
-      ]),
-      onSuccess: (_) => Future.wait(document.files.map((f) => f.delete())),
+      onSend: (_) => driveRepository
+          .uploadSpec(spec)
+          .whenComplete(() => driveRepository.deleteFiles(document.files)),
+      onSuccess: (d) => cleanupFiles(d.getFiles()),
       onError: (_) async {
         spec.writeAsStringSync(documents.serialize());
         return documents;

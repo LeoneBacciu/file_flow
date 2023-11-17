@@ -40,37 +40,40 @@ class _ProfilePageState extends SearchQueryState<ProfilePage> {
     return Scaffold(
       body: BlocBuilder<SyncCubit, SyncState>(
         builder: (context, state) {
-          return CustomScrollView(
-            slivers: [
-              ProfileOverview(),
-              DocumentSearchBar(onSearch: querySearch),
-              SliverList.list(
-                children: (state is SyncLoaded)
-                    ? state.documents
-                        .unfrozen()
-                        .sorted(querySort)
-                        .where(queryFilter)
-                        .map(
-                          (d) => ListTile(
-                            leading: CircleAvatar(
-                              backgroundImage: FileImage(d.preview),
-                            ),
-                            trailing: Icon(d.category.iconData),
-                            title: Text(d.name),
-                            subtitle: Text(DateFormat('HH:mm - dd/MM/yyyy')
-                                .format(d.lastModified)),
-                            onTap: () => Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (context) => PreviewPage(document: d),
+          return RefreshIndicator(
+            onRefresh: () async => BlocProvider.of<SyncCubit>(context).load(),
+            child: CustomScrollView(
+              slivers: [
+                ProfileOverview(),
+                DocumentSearchBar(onSearch: querySearch),
+                SliverList.list(
+                  children: (state is SyncLoaded)
+                      ? state.documents
+                          .unfrozen()
+                          .sorted(querySort)
+                          .where(queryFilter)
+                          .map(
+                            (d) => ListTile(
+                              leading: CircleAvatar(
+                                backgroundImage: FileImage(d.preview),
+                              ),
+                              trailing: Icon(d.category.iconData),
+                              title: Text(d.name),
+                              subtitle: Text(DateFormat('HH:mm - dd/MM/yyyy')
+                                  .format(d.lastModified)),
+                              onTap: () => Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (context) => PreviewPage(document: d),
+                                ),
                               ),
                             ),
-                          ),
-                        )
-                        .toList()
-                    : [],
-              ),
-              const SliverToBoxAdapter(child: Separator.height(100))
-            ],
+                          )
+                          .toList()
+                      : [],
+                ),
+                const SliverToBoxAdapter(child: Separator.height(100))
+              ],
+            ),
           );
         },
       ),
