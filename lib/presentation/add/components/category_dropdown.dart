@@ -1,4 +1,4 @@
-import 'package:file_flow/core/functions.dart';
+import 'package:file_flow/core/translations.dart';
 import 'package:flutter/material.dart';
 
 import '../../../models/document.dart';
@@ -21,7 +21,7 @@ class CategoryDropdown extends StatelessWidget {
         dropdownMenuEntries: DocumentCategory.list()
             .map((value) => DropdownMenuEntry<DocumentCategory>(
                   value: value,
-                  label: value.jsonValue.capitalize(),
+                  label: translateCategory[value.jsonValue]!,
                 ))
             .toList(),
       ),

@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:file_flow/core/functions.dart';
+import 'package:file_flow/core/translations.dart';
 import 'package:file_flow/models/document.dart';
 import 'package:file_flow/presentation/add/components/category_dropdown.dart';
 import 'package:file_flow/presentation/add/components/content_form.dart';
@@ -31,7 +31,7 @@ class _AddPageState extends State<AddPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Add ${category.jsonValue.capitalize()}'),
+        title: Text('Add ${translateCategory[category.jsonValue]!}'),
       ),
       body: SafeArea(
         child: SingleChildScrollView(

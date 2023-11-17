@@ -42,7 +42,7 @@ NavigationBar commonNavigationBar(BuildContext context, NavigationRoute route,
         NavigationDestination(icon: Icon(Icons.person), label: 'Profilo'),
         NavigationDestination(icon: Icon(Icons.attach_money), label: 'Finanze'),
         NavigationDestination(
-            icon: Icon(Icons.more_vert), label: 'Impostazioni'),
+            icon: Icon(Icons.more_vert), label: 'Altro'),
       ],
     );
 

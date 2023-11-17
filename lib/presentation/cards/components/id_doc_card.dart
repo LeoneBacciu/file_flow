@@ -26,7 +26,7 @@ class CardsCard extends StatelessWidget {
               aspectRatio: 85.60 / 53.98,
               child: Hero(
                 tag: document.preview.path,
-                child: Image.file(document.preview),
+                child: Image.file(document.preview, fit: BoxFit.cover),
               ),
             ),
             Padding(
