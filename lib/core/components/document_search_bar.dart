@@ -22,19 +22,34 @@ class _DocumentSearchBarState extends State<DocumentSearchBar> {
       surfaceTintColor: Colors.transparent,
       backgroundColor: Colors.transparent,
       pinned: true,
-      collapsedHeight: kToolbarHeight + 32,
-      expandedHeight: kToolbarHeight + 32,
-      flexibleSpace: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-        child: SearchBar(
-          onChanged: (text) =>
-              widget.onSearch(_query = SearchQuery(text, widget.category)),
-          padding: const MaterialStatePropertyAll<EdgeInsets>(
-            EdgeInsets.symmetric(horizontal: 16.0),
+      collapsedHeight: 76,
+      expandedHeight: 76,
+      flexibleSpace: Stack(
+        children: [
+          SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
+              child: SearchBar(
+                onChanged: (text) => widget
+                    .onSearch(_query = SearchQuery(text, widget.category)),
+                padding: const MaterialStatePropertyAll<EdgeInsets>(
+                  EdgeInsets.symmetric(horizontal: 16.0),
+                ),
+                leading: const Icon(Icons.search),
+                trailing: const [Icon(Icons.tune)],
+              ),
+            ),
           ),
-          leading: const Icon(Icons.search),
-          trailing: const [Icon(Icons.tune)],
-        ),
+          Positioned(
+            top: 0,
+            left: 0,
+            child: Container(
+              width: MediaQuery.of(context).size.width,
+              height: MediaQuery.of(context).viewPadding.top,
+              color: Colors.blue.shade800,
+            ),
+          ),
+        ],
       ),
     );
   }
