@@ -115,6 +115,7 @@ class _ContentFormState extends State<ContentForm> {
 
     final amountRegex = RegExp(r"(\d+[.|,]\d\d)");
 
+    // print(text);
     // print(
     //     'dates: ${dateRegex.allMatches(text).map((e) => text.substring(e.start, e.end))}');
     // print(
@@ -125,8 +126,11 @@ class _ContentFormState extends State<ContentForm> {
 
     if (dateMatch != null) {
       try {
-        dateInput.text = DateUi.format(
-            DateUi.parse(text.substring(dateMatch.start, dateMatch.end)));
+        final formatted = text
+            .substring(dateMatch.start, dateMatch.end)
+            .replaceAll(RegExp(r"[- .]"), '/');
+        final validated = DateUi.format(DateUi.parse(formatted));
+        dateInput.text = validated;
       } catch (e) {
         dev.log('Wrong date format');
       }
@@ -134,9 +138,11 @@ class _ContentFormState extends State<ContentForm> {
 
     if (amountMatch != null) {
       try {
-        amountInput.text =
-            double.parse(text.substring(amountMatch.start, amountMatch.end))
-                .toStringAsFixed(2);
+        final formatted = text
+            .substring(amountMatch.start, amountMatch.end)
+            .replaceAll(RegExp(r","), '.');
+        final validated = double.parse(formatted).toStringAsFixed(2);
+        amountInput.text = validated;
       } catch (e) {
         dev.log('Wrong double format');
       }
@@ -150,6 +156,7 @@ class _ContentFormState extends State<ContentForm> {
 
     for (Barcode barcode in barcodes) {
       final BarcodeType type = barcode.type;
+      print(barcode.rawValue);
 
       if (type == BarcodeType.url) {
         final barcodeUrl = barcode.value as BarcodeUrl;
