@@ -24,7 +24,7 @@ class _ContentFormState extends State<ContentForm> {
   TextEditingController dateInput = TextEditingController();
   TextEditingController amountInput = TextEditingController();
 
-  final urls = <Uri>[];
+  final urls = <String>[];
 
   void updateListener() {
     if (dateInput.text.isNotEmpty && amountInput.text.isNotEmpty) {
@@ -32,7 +32,7 @@ class _ContentFormState extends State<ContentForm> {
         DocumentContent(
           date: DateUi.parse(dateInput.text),
           amount: double.parse(amountInput.text),
-          urls: urls,
+          qrs: urls,
         ),
       );
     }
@@ -156,11 +156,13 @@ class _ContentFormState extends State<ContentForm> {
 
     for (Barcode barcode in barcodes) {
       final BarcodeType type = barcode.type;
-      print(barcode.rawValue);
 
       if (type == BarcodeType.url) {
         final barcodeUrl = barcode.value as BarcodeUrl;
-        if (barcodeUrl.url != null) urls.add(Uri.parse(barcodeUrl.url!));
+        if (barcodeUrl.url != null) urls.add(barcodeUrl.url!);
+      }
+      if (type == BarcodeType.text) {
+        if (barcode.rawValue != null) urls.add(barcode.rawValue!);
       }
     }
 

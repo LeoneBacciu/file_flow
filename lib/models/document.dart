@@ -118,29 +118,29 @@ class Document extends Equatable {
 class DocumentContent extends Equatable {
   final DateTime date;
   final double amount;
-  final List<Uri> urls;
+  final List<String> qrs;
 
   const DocumentContent({
     required this.date,
     required this.amount,
-    required this.urls,
+    required this.qrs,
   });
 
   DocumentContent.fromJson(Map<String, dynamic> json)
       : date = DateTime.parse(json['date']),
         amount = json['amount'],
-        urls = List.castFrom(json['urls']).map((e) => Uri.parse(e)).toList();
+        qrs = List.castFrom(json['qrs']);
 
   Map<String, dynamic> toJson() {
     final data = <String, dynamic>{};
     data['date'] = date.toIso8601String();
     data['amount'] = amount;
-    data['urls'] = urls.map((e) => e.toString()).toList();
+    data['qrs'] = qrs;
     return data;
   }
 
   @override
-  List<Object?> get props => [date, amount, urls];
+  List<Object?> get props => [date, amount, qrs];
 }
 
 extension DocumentListExtension on DocumentListEditable {

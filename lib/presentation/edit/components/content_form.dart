@@ -36,7 +36,7 @@ class _ContentFormState extends State<ContentForm> {
         DocumentContent(
           date: date,
           amount: double.parse(amountInput.text),
-          urls: const [],
+          qrs: const [],
         ),
       );
     }

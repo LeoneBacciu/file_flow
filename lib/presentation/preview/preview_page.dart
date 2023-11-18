@@ -3,6 +3,7 @@ import 'package:file_flow/models/document.dart';
 import 'package:file_flow/presentation/edit/edit_page.dart';
 import 'package:file_flow/presentation/preview/components/images_preview.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:share_plus/share_plus.dart';
 
@@ -54,17 +55,31 @@ class _PreviewPageState extends State<PreviewPage> {
               SliverAppBar(
                 floating: true,
                 automaticallyImplyLeading: false,
-                flexibleSpace: Wrap(
-                  alignment: WrapAlignment.center,
-                  children: widget.document.content!.urls
-                      .map(
-                        (u) => ActionChip(
-                          avatar: const Icon(Icons.public),
-                          label: Text(u.host),
-                          onPressed: () => Share.shareUri(u),
-                        ),
-                      )
-                      .toList(),
+                flexibleSpace: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Wrap(
+                    alignment: WrapAlignment.center,
+                    children: widget.document.content!.qrs.map(
+                      (u) {
+                        if (u.startsWith('http')) {
+                          final uri = Uri.parse(u);
+                          return ActionChip(
+                            avatar: const Icon(Icons.public),
+                            label: Text(uri.host),
+                            onPressed: () => Share.shareUri(uri),
+                          );
+                        } else {
+                          return ActionChip(
+                            avatar: const Icon(Icons.text_fields),
+                            label: Text(u),
+                            onPressed: () => Clipboard.setData(
+                              ClipboardData(text: u),
+                            ),
+                          );
+                        }
+                      },
+                    ).toList(),
+                  ),
                 ),
               ),
             ImagesPreview(
