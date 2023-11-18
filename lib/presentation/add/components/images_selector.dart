@@ -1,7 +1,7 @@
 import 'dart:io';
 
+import 'package:file_flow/core/components/file_picker_modal.dart';
 import 'package:file_flow/core/convert.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 
 class ImagesSelector extends StatefulWidget {
@@ -49,7 +49,10 @@ class _ImagesSelectorState extends State<ImagesSelector> {
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: InkWell(
-                    onTap: addImage,
+                    onTap: () => showModalBottomSheet<List<File>>(
+                      context: context,
+                      builder: (context) => const FilePickerModal(),
+                    ).then(addImages),
                     child: const Center(
                       child: Icon(Icons.add, size: 50),
                     ),
@@ -79,7 +82,10 @@ class _ImagesSelectorState extends State<ImagesSelector> {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           ElevatedButton(
-                            onPressed: () => editImage(index),
+                            onPressed: () => showModalBottomSheet<List<File>>(
+                              context: context,
+                              builder: (context) => const FilePickerModal(),
+                            ).then((f) => editImages(f, index)),
                             style: ElevatedButton.styleFrom(
                               shape: const CircleBorder(),
                               padding: const EdgeInsets.all(0),
@@ -108,29 +114,20 @@ class _ImagesSelectorState extends State<ImagesSelector> {
     );
   }
 
-  void addImage() async {
-    FilePickerResult? result = await FilePicker.platform.pickFiles(
-      type: FileType.custom,
-      allowedExtensions: ['jpg', 'jpeg', 'png', 'pdf'],
-      allowMultiple: true,
-    );
+  Future<void> addImages(List<File>? result) async {
     if (result != null) {
-      final files = await FilesConverter.convert(
-          result.files.map((f) => File(f.path!)).toList());
+      final files = await FilesConverter.convert(result);
       update(() => images.addAll(files));
     }
   }
 
-  void editImage(int index) async {
-    FilePickerResult? result = await FilePicker.platform.pickFiles(
-      type: FileType.custom,
-      allowedExtensions: ['jpg', 'jpeg', 'png', 'pdf'],
-      allowMultiple: false,
-    );
+  Future<void> editImages(List<File>? result, int index) async {
     if (result != null) {
-      final files =
-          await FilesConverter.convert([File(result.files.first.path!)]);
-      update(() => images[index] = files.first);
+      final files = await FilesConverter.convert(result);
+      update(() {
+        images.removeAt(index);
+        images.insertAll(index, files);
+      });
     }
   }
 }
