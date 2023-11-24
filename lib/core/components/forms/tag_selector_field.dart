@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
 class TagSelectorField extends StatefulWidget {
-  final Set<String>? initialState;
+  final Set<String>? initialValue;
   final void Function(Set<String>)? onChange;
 
-  const TagSelectorField({super.key, this.initialState, this.onChange});
+  const TagSelectorField({super.key, this.initialValue, this.onChange});
 
   @override
   State<TagSelectorField> createState() => _TagSelectorFieldState();
@@ -12,7 +12,7 @@ class TagSelectorField extends StatefulWidget {
 
 class _TagSelectorFieldState extends State<TagSelectorField> {
   final candidates = {'Luce', 'Gas', 'Acqua'};
-  late final tags = widget.initialState ?? {};
+  late final tags = widget.initialValue ?? {};
 
   @override
   Widget build(BuildContext context) {

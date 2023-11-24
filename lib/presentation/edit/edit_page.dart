@@ -1,12 +1,14 @@
-import 'package:file_flow/core/components/common.dart';
-import 'package:file_flow/models/document.dart';
-import 'package:file_flow/presentation/edit/components/images_selector.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../core/components/common.dart';
+import '../../core/components/forms/content_form_field.dart';
+import '../../core/components/forms/filename_text_field.dart';
+import '../../core/components/forms/images_selector_field.dart';
+import '../../core/components/forms/tag_selector_field.dart';
 import '../../core/components/separator.dart';
+import '../../models/document.dart';
 import '../../state/sync/sync_cubit.dart';
-import 'components/content_form.dart';
 
 class EditPage extends StatefulWidget {
   final Document document;
@@ -35,23 +37,25 @@ class _EditPageState extends State<EditPage> {
         child: SingleChildScrollView(
           child: Column(
             children: [
-              ImagesSelector(
+              ImagesSelectorField(
                 heroRoute: widget.heroRoute,
                 initialValue: document.files,
-                onChange: (fs) =>
-                    setState(() => document = document.copyWith(files: fs)),
+                onChange: (fs) => setState(
+                  () => document = document.copyWith(files: fs),
+                ),
               ),
               const Separator.height(30),
-              SizedBox(
-                width: 300,
-                child: TextFormField(
-                  initialValue: document.name,
-                  onChanged: (s) =>
-                      setState(() => document = document.copyWith(name: s)),
-                  decoration: const InputDecoration(
-                    border: OutlineInputBorder(),
-                    labelText: 'Nome Documento',
-                  ),
+              FilenameTextField(
+                initialValue: document.name,
+                onChange: (s) => setState(
+                  () => document = document.copyWith(name: s),
+                ),
+              ),
+              const Separator.height(30),
+              TagSelectorField(
+                initialValue: document.tags,
+                onChange: (t) => setState(
+                  () => document = document.copyWith(tags: t),
                 ),
               ),
               const Separator.height(30),
@@ -61,11 +65,12 @@ class _EditPageState extends State<EditPage> {
                     (Widget child, Animation<double> animation) =>
                         ScaleTransition(scale: animation, child: child),
                 child: document.category.parsing && document.files.isNotEmpty
-                    ? ContentForm(
-                        initialValue: document.content!,
+                    ? ContentFormField(
                         source: document.files.first,
+                        initialValue: document.content!,
                         onChange: (c) => setState(
-                            () => document = document.copyWith(content: c)),
+                          () => document = document.copyWith(content: c),
+                        ),
                       )
                     : const SizedBox(),
               ),
