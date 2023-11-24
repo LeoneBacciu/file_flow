@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:file_flow/core/components/file_picker_modal.dart';
+import 'package:file_flow/core/components/forms/file_picker_modal.dart';
 import 'package:file_flow/core/convert.dart';
 import 'package:flutter/material.dart';
 

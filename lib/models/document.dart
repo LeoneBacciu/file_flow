@@ -38,6 +38,7 @@ enum DocumentCategory {
 class Document extends Equatable {
   final String uuid;
   final DocumentCategory category;
+  final Set<String> tags;
   final String name;
   final DateTime lastModified;
   final List<File> files;
@@ -45,6 +46,7 @@ class Document extends Equatable {
 
   Document({
     required this.category,
+    required this.tags,
     required this.name,
     required this.lastModified,
     required this.files,
@@ -54,15 +56,17 @@ class Document extends Equatable {
   const Document.uuid({
     required this.uuid,
     required this.category,
+    required this.tags,
     required this.name,
     required this.lastModified,
     required this.files,
     this.content,
   });
 
-  Document edit({
+  Document copyWith({
     String? uuid,
     DocumentCategory? category,
+    Set<String>? tags,
     String? name,
     DateTime? lastModified,
     List<File>? files,
@@ -71,6 +75,7 @@ class Document extends Equatable {
       Document.uuid(
         uuid: uuid ?? this.uuid,
         category: category ?? this.category,
+        tags: tags ?? this.tags,
         name: name ?? this.name,
         lastModified: lastModified ?? this.lastModified,
         files: files ?? [...this.files],
@@ -82,6 +87,7 @@ class Document extends Equatable {
   Document.fromJson(Map<String, dynamic> json, File Function(String) fileHandle)
       : uuid = json['id'],
         category = DocumentCategory.fromJson(json['category']),
+        tags = List.castFrom<dynamic, String>(json['tags']).toSet(),
         name = json['name'],
         lastModified = DateTime.parse(json['last_modified']),
         files = List.castFrom<dynamic, String>(json['files'])
@@ -97,6 +103,7 @@ class Document extends Equatable {
     final data = <String, dynamic>{};
     data['id'] = uuid;
     data['category'] = category.jsonValue;
+    data['tags'] = tags.toList();
     data['name'] = name;
     data['last_modified'] = lastModified.toIso8601String();
     data['files'] = files.map((f) => basename(f.path)).toList();
@@ -106,7 +113,7 @@ class Document extends Equatable {
 
   @override
   List<Object?> get props =>
-      [uuid, category, name, lastModified, files, content];
+      [uuid, category, tags, name, lastModified, files, content];
 
   static DocumentListEditable deserialize(
           String data, File Function(String) fileHandler) =>
@@ -126,6 +133,17 @@ class DocumentContent extends Equatable {
     required this.qrs,
   });
 
+  DocumentContent copyWith({
+    DateTime? date,
+    double? amount,
+    List<String>? qrs,
+  }) =>
+      DocumentContent(
+        date: date ?? this.date,
+        amount: amount ?? this.amount,
+        qrs: qrs ?? this.qrs,
+      );
+
   DocumentContent.fromJson(Map<String, dynamic> json)
       : date = DateTime.parse(json['date']),
         amount = json['amount'],
@@ -144,7 +162,9 @@ class DocumentContent extends Equatable {
 }
 
 extension DocumentListExtension on DocumentListEditable {
-  List<File> getFiles() => expand((d) => d.files).toList();
+  List<File> extractFiles() => expand((d) => d.files).toList();
+
+  Set<String> extractTags() => expand((d) => d.tags).toSet();
 
   Document? getUuid(String uuid) =>
       cast<Document?>().firstWhere((d) => d!.uuid == uuid, orElse: () => null);

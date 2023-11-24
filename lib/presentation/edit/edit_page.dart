@@ -23,7 +23,7 @@ class EditPage extends StatefulWidget {
 }
 
 class _EditPageState extends State<EditPage> {
-  late Document document = widget.document.edit();
+  late Document document = widget.document.copyWith();
 
   @override
   Widget build(BuildContext context) {
@@ -39,7 +39,7 @@ class _EditPageState extends State<EditPage> {
                 heroRoute: widget.heroRoute,
                 initialValue: document.files,
                 onChange: (fs) =>
-                    setState(() => document = document.edit(files: fs)),
+                    setState(() => document = document.copyWith(files: fs)),
               ),
               const Separator.height(30),
               SizedBox(
@@ -47,7 +47,7 @@ class _EditPageState extends State<EditPage> {
                 child: TextFormField(
                   initialValue: document.name,
                   onChanged: (s) =>
-                      setState(() => document = document.edit(name: s)),
+                      setState(() => document = document.copyWith(name: s)),
                   decoration: const InputDecoration(
                     border: OutlineInputBorder(),
                     labelText: 'Nome Documento',
@@ -65,7 +65,7 @@ class _EditPageState extends State<EditPage> {
                         initialValue: document.content!,
                         source: document.files.first,
                         onChange: (c) => setState(
-                            () => document = document.edit(content: c)),
+                            () => document = document.copyWith(content: c)),
                       )
                     : const SizedBox(),
               ),
@@ -77,7 +77,7 @@ class _EditPageState extends State<EditPage> {
         heroTag: widget.heroRoute,
         onPressed: () {
           BlocProvider.of<SyncCubit>(context).editDocument(
-            document.edit(lastModified: DateTime.now()),
+            document.copyWith(lastModified: DateTime.now()),
           );
           Navigator.of(context).pop();
         },

@@ -66,7 +66,7 @@ class SyncRepository {
     final files = await getFilesMap();
     final docs = Document.deserialize(spec.readAsStringSync(), (f) => files[f]!)
         .frozen();
-    cleanupFiles(docs.getFiles());
+    cleanupFiles(docs.extractFiles());
     return docs;
   }
 
@@ -76,7 +76,7 @@ class SyncRepository {
     await driveRepository.downloadSpec(spec);
     await driveRepository.downloadFiles(filesDir);
     final docs = await loadOffline();
-    driveRepository.cleanupFiles(docs.getFiles());
+    driveRepository.cleanupFiles(docs.extractFiles());
     return docs;
   }
 
@@ -100,7 +100,7 @@ class SyncRepository {
           .whenComplete(() => driveRepository.uploadSpec(spec)),
       onError: (_) async {
         spec.writeAsStringSync(documents.serialize());
-        await cleanupFiles(documents.getFiles());
+        await cleanupFiles(documents.extractFiles());
         return documents;
       },
     );
@@ -124,11 +124,11 @@ class SyncRepository {
       onSend: (d) => driveRepository.uploadFiles(copiedFiles).whenComplete(() =>
           driveRepository
               .uploadSpec(spec)
-              .whenComplete(() => driveRepository.cleanupFiles(d.getFiles()))),
-      onSuccess: (d) => cleanupFiles(d.getFiles()),
+              .whenComplete(() => driveRepository.cleanupFiles(d.extractFiles()))),
+      onSuccess: (d) => cleanupFiles(d.extractFiles()),
       onError: (_) async {
         spec.writeAsStringSync(documents.serialize());
-        await cleanupFiles(documents.getFiles());
+        await cleanupFiles(documents.extractFiles());
         return documents;
       },
     );
@@ -146,7 +146,7 @@ class SyncRepository {
       onSend: (_) => driveRepository
           .uploadSpec(spec)
           .whenComplete(() => driveRepository.deleteFiles(document.files)),
-      onSuccess: (d) => cleanupFiles(d.getFiles()),
+      onSuccess: (d) => cleanupFiles(d.extractFiles()),
       onError: (_) async {
         spec.writeAsStringSync(documents.serialize());
         return documents;

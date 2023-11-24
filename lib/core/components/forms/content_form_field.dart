@@ -1,49 +1,48 @@
 import 'dart:io';
-import 'dart:developer' as dev;
 
-import 'package:file_flow/models/document.dart';
+import 'package:file_flow/core/functions.dart';
 import 'package:flutter/material.dart';
+import 'dart:developer' as dev;
+import 'package:file_flow/models/document.dart';
 import 'package:flutter/services.dart';
-import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:google_mlkit_barcode_scanning/google_mlkit_barcode_scanning.dart';
+import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 
-import '../../../core/components/separator.dart';
-import '../../../core/date_ui.dart';
+import '../../date_ui.dart';
+import '../separator.dart';
 
-class ContentForm extends StatefulWidget {
+typedef DocumentContentState = FormFieldState<DocumentContent>;
+
+class ContentFormField extends StatefulWidget {
+  final DocumentContent? initialValue;
+  final void Function(DocumentContent)? onChange;
   final File source;
-  final void Function(DocumentContent) onChange;
 
-  const ContentForm({super.key, required this.source, required this.onChange});
+  const ContentFormField({
+    super.key,
+    this.initialValue,
+    this.onChange,
+    required this.source,
+  });
 
   @override
-  State<ContentForm> createState() => _ContentFormState();
+  State<ContentFormField> createState() => _ContentFormFieldState();
 }
 
-class _ContentFormState extends State<ContentForm> {
-  TextEditingController dateInput = TextEditingController();
-  TextEditingController amountInput = TextEditingController();
+class _ContentFormFieldState extends State<ContentFormField> {
+  late final dateInput = TextEditingController()
+    ..text = widget.initialValue?.date.apply(DateUi.format) ?? '';
+  late final amountInput = TextEditingController()
+    ..text = widget.initialValue?.amount.toStringAsFixed(2) ?? '';
 
-  final urls = <String>[];
-
-  void updateListener() {
-    if (dateInput.text.isNotEmpty && amountInput.text.isNotEmpty) {
-      widget.onChange(
-        DocumentContent(
-          date: DateUi.parse(dateInput.text),
-          amount: double.parse(amountInput.text),
-          qrs: urls,
-        ),
-      );
-    }
-  }
+  late DocumentContent documentContent = widget.initialValue ??
+      DocumentContent(date: DateTime.now(), amount: 0, qrs: const []);
 
   @override
   void initState() {
     super.initState();
-    dateInput.addListener(updateListener);
-    amountInput.addListener(updateListener);
-    extractData(widget.source);
+    WidgetsBinding.instance
+        .addPostFrameCallback((_) => extractData(widget.source));
   }
 
   @override
@@ -53,30 +52,26 @@ class _ContentFormState extends State<ContentForm> {
       children: [
         SizedBox(
           width: 300,
-          child: TextFormField(
-            controller: dateInput,
-            decoration: const InputDecoration(
-              border: OutlineInputBorder(),
-              icon: Icon(
-                Icons.calendar_today,
+          child: Builder(builder: (context) {
+            return TextField(
+              controller: dateInput,
+              decoration: const InputDecoration(
+                border: OutlineInputBorder(),
+                labelText: "Conferma la data",
               ),
-              labelText: "Conferma la data",
-            ),
-            readOnly: true,
-            onTap: () async {
-              DateTime? pickedDate = await showDatePicker(
+              readOnly: true,
+              onTap: () async {
+                DateTime? pickedDate = await showDatePicker(
                   context: context,
                   initialDate: DateTime.now(),
                   firstDate: DateTime(2000),
-                  lastDate: DateTime(2101));
+                  lastDate: DateTime(2101),
+                );
 
-              setState(() {
-                if (pickedDate != null) {
-                  dateInput.text = DateUi.format(pickedDate);
-                }
-              });
-            },
-          ),
+                if (pickedDate != null) updateState(date: pickedDate);
+              },
+            );
+          }),
         ),
         const Separator.height(30),
         SizedBox(
@@ -86,14 +81,12 @@ class _ContentFormState extends State<ContentForm> {
             keyboardType: const TextInputType.numberWithOptions(decimal: true),
             decoration: const InputDecoration(
               border: OutlineInputBorder(),
-              icon: Icon(
-                Icons.euro,
-              ),
               labelText: "Conferma il costo",
             ),
             inputFormatters: <TextInputFormatter>[
               FilteringTextInputFormatter.allow(RegExp(r"[0-9.]")),
             ],
+            onChanged: (a) => updateState(amount: double.parse(a)),
           ),
         )
       ],
@@ -123,14 +116,16 @@ class _ContentFormState extends State<ContentForm> {
 
     final dateMatch = dateRegex.firstMatch(text);
     final amountMatch = amountRegex.firstMatch(text);
+    DateTime? date;
+    double? amount;
+    List<String> qrs = [];
 
     if (dateMatch != null) {
       try {
         final formatted = text
             .substring(dateMatch.start, dateMatch.end)
             .replaceAll(RegExp(r"[- .]"), '/');
-        final validated = DateUi.format(DateUi.parse(formatted));
-        dateInput.text = validated;
+        date = DateUi.parse(formatted);
       } catch (e) {
         dev.log('Wrong date format');
       }
@@ -141,8 +136,7 @@ class _ContentFormState extends State<ContentForm> {
         final formatted = text
             .substring(amountMatch.start, amountMatch.end)
             .replaceAll(RegExp(r","), '.');
-        final validated = double.parse(formatted).toStringAsFixed(2);
-        amountInput.text = validated;
+        amount = double.parse(formatted);
       } catch (e) {
         dev.log('Wrong double format');
       }
@@ -159,20 +153,23 @@ class _ContentFormState extends State<ContentForm> {
 
       if (type == BarcodeType.url) {
         final barcodeUrl = barcode.value as BarcodeUrl;
-        if (barcodeUrl.url != null) urls.add(barcodeUrl.url!);
+        if (barcodeUrl.url != null) qrs.add(barcodeUrl.url!);
       }
       if (type == BarcodeType.text) {
-        if (barcode.rawValue != null) urls.add(barcode.rawValue!);
+        if (barcode.rawValue != null) qrs.add(barcode.rawValue!);
       }
     }
 
     barcodeScanner.close();
+
+    updateState(date: date, amount: amount, qrs: qrs);
   }
 
-  @override
-  void dispose() {
-    dateInput.dispose();
-    amountInput.dispose();
-    super.dispose();
+  void updateState({DateTime? date, double? amount, List<String>? qrs}) {
+    if (date != null) dateInput.text = DateUi.format(date);
+    if (amount != null) amountInput.text = amount.toStringAsFixed(2);
+    setState(() => documentContent =
+        documentContent.copyWith(date: date, amount: amount, qrs: qrs));
+    widget.onChange?.call(documentContent);
   }
 }

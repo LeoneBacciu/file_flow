@@ -1,10 +1,12 @@
 import 'dart:io';
 
+import 'package:file_flow/core/components/forms/category_dropdown_field.dart';
+import 'package:file_flow/core/components/forms/content_form_field.dart';
+import 'package:file_flow/core/components/forms/filename_text_field.dart';
+import 'package:file_flow/core/components/forms/images_selector_field.dart';
+import 'package:file_flow/core/components/forms/tag_selector_field.dart';
 import 'package:file_flow/core/translations.dart';
 import 'package:file_flow/models/document.dart';
-import 'package:file_flow/presentation/add/components/category_dropdown.dart';
-import 'package:file_flow/presentation/add/components/content_form.dart';
-import 'package:file_flow/presentation/add/components/images_selector.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -23,8 +25,8 @@ class AddPage extends StatefulWidget {
 class _AddPageState extends State<AddPage> {
   List<File> images = [];
   late DocumentCategory category = widget.category;
-  String name = '';
-
+  Set<String> tags = {};
+  String? name;
   DocumentContent? documentContent;
 
   @override
@@ -37,23 +39,20 @@ class _AddPageState extends State<AddPage> {
         child: SingleChildScrollView(
           child: Column(
             children: [
-              ImagesSelector(
+              ImagesSelectorField(
                 onChange: (i) => setState(() => images = i),
               ),
-              CategoryDropdown(
-                category: category,
+              CategoryDropdownField(
+                initialValue: category,
                 onChange: (c) => setState(() => category = c),
               ),
               const Separator.height(30),
-              SizedBox(
-                width: 300,
-                child: TextFormField(
-                  onChanged: (s) => setState(() => name = s),
-                  decoration: const InputDecoration(
-                    border: OutlineInputBorder(),
-                    labelText: 'Nome Documento',
-                  ),
-                ),
+              FilenameTextField(
+                onChange: (s) => setState(() => name = s),
+              ),
+              const Separator.height(30),
+              TagSelectorField(
+                onChange: (t) => setState(() => tags = t),
               ),
               const Separator.height(30),
               AnimatedSwitcher(
@@ -62,31 +61,47 @@ class _AddPageState extends State<AddPage> {
                     (Widget child, Animation<double> animation) =>
                         ScaleTransition(scale: animation, child: child),
                 child: category.parsing && images.isNotEmpty
-                    ? ContentForm(
+                    ? ContentFormField(
                         source: images.first,
                         onChange: (c) => setState(() => documentContent = c),
                       )
                     : const SizedBox(),
               ),
+              const Separator.height(100),
             ],
           ),
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          BlocProvider.of<SyncCubit>(context).addDocument(
-            Document(
-              category: category,
-              name: name,
-              lastModified: DateTime.now(),
-              files: images,
-              content: documentContent,
-            ),
-          );
-          Navigator.of(context).pop();
-        },
-        child: const Icon(Icons.save),
-      ),
+      floatingActionButton: Builder(
+          builder: (context) => FloatingActionButton(
+                onPressed: () {
+                  if (name == null || (name?.isEmpty ?? false)) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                          content: Text('Il nome non può essere vuoto')),
+                    );
+                    return;
+                  }
+                  if (images.isEmpty) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Inserisci almeno un file')),
+                    );
+                    return;
+                  }
+                  BlocProvider.of<SyncCubit>(context).addDocument(
+                    Document(
+                      category: category,
+                      tags: tags,
+                      name: name!,
+                      lastModified: DateTime.now(),
+                      files: images,
+                      content: documentContent,
+                    ),
+                  );
+                  Navigator.of(context).pop();
+                },
+                child: const Icon(Icons.save),
+              )),
     );
   }
 }
