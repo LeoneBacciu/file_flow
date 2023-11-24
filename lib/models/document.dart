@@ -9,20 +9,49 @@ import 'package:path/path.dart';
 
 typedef DocumentListEditable = List<Document>;
 typedef DocumentList = UnmodifiableListView<Document>;
+typedef TagSet = Set<String>;
 
 enum DocumentCategory {
-  card('card', 'Carta', Icons.info),
-  bill('bill', 'Bolletta', Icons.home, true),
-  bank('bank', 'Banca', Icons.attach_money, true),
-  other('other', 'Altro', Icons.description);
+  card(
+    'card',
+    'Carta',
+    Icons.info,
+    {'Carta d\'Identità', 'Tessera Sanitaria', 'Patente', 'Passaporto'},
+  ),
+  bill(
+    'bill',
+    'Bolletta',
+    Icons.home,
+    {'Luce', 'Gas', 'Acqua', 'Rifiuti'},
+    true,
+  ),
+  bank(
+    'bank',
+    'Banca',
+    Icons.attach_money,
+    {},
+    true,
+  ),
+  other(
+    'other',
+    'Altro',
+    Icons.description,
+    {},
+  );
 
   final String jsonValue;
   final String displayName;
   final IconData iconData;
+  final TagSet defaultTags;
   final bool parsing;
 
-  const DocumentCategory(this.jsonValue, this.displayName, this.iconData,
-      [this.parsing = false]);
+  const DocumentCategory(
+    this.jsonValue,
+    this.displayName,
+    this.iconData,
+    this.defaultTags, [
+    this.parsing = false,
+  ]);
 
   factory DocumentCategory.fromJson(String json) =>
       values.firstWhere((e) => e.jsonValue == json);
@@ -161,7 +190,7 @@ class DocumentContent extends Equatable {
   List<Object?> get props => [date, amount, qrs];
 }
 
-extension DocumentListExtension on DocumentListEditable {
+extension DocumentListEditableExtension on DocumentListEditable {
   List<File> extractFiles() => expand((d) => d.files).toList();
 
   Set<String> extractTags() => expand((d) => d.tags).toSet();
@@ -191,7 +220,7 @@ extension DocumentListExtension on DocumentListEditable {
   DocumentList frozen() => UnmodifiableListView(this);
 }
 
-extension DocumentListUExtension on DocumentList {
+extension DocumentListExtension on DocumentList {
   DocumentListEditable unfrozen() => toList();
 }
 

@@ -52,6 +52,7 @@ class _AddPageState extends State<AddPage> {
               ),
               const Separator.height(30),
               TagSelectorField(
+                defaultTags: category.defaultTags,
                 onChange: (t) => setState(() => tags = t),
               ),
               const Separator.height(30),

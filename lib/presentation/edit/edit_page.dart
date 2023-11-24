@@ -53,6 +53,7 @@ class _EditPageState extends State<EditPage> {
               ),
               const Separator.height(30),
               TagSelectorField(
+                defaultTags: document.category.defaultTags.union(document.tags),
                 initialValue: document.tags,
                 onChange: (t) => setState(
                   () => document = document.copyWith(tags: t),
