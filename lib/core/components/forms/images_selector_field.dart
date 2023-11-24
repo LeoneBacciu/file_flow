@@ -1,9 +1,9 @@
 import 'dart:io';
 
-import 'package:file_flow/core/components/common.dart';
 import 'package:flutter/material.dart';
 
 import '../../convert.dart';
+import '../common.dart';
 import 'file_picker_modal.dart';
 
 class ImagesSelectorField extends StatefulWidget {

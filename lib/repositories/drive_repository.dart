@@ -1,11 +1,12 @@
 import 'dart:io';
 
-import 'package:file_flow/core/errors.dart';
-import 'package:file_flow/models/document.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:googleapis/drive/v3.dart' as drive;
 import 'package:http/http.dart' as http;
 import 'package:path/path.dart';
+
+import '../core/errors.dart';
+import '../models/document.dart';
 
 class DriveRepository {
   static const appDataFolder = 'appDataFolder';

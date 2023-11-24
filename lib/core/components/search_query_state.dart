@@ -1,7 +1,7 @@
-import 'package:file_flow/models/search_query.dart';
 import 'package:flutter/material.dart';
 
 import '../../models/document.dart';
+import '../../models/search_query.dart';
 
 abstract class SearchQueryState<T extends StatefulWidget> extends State<T> {
   late SearchQuery _query = initialQuery;

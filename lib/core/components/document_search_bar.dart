@@ -1,6 +1,7 @@
-import 'package:file_flow/models/document.dart';
-import 'package:file_flow/models/search_query.dart';
 import 'package:flutter/material.dart';
+
+import '../../models/document.dart';
+import '../../models/search_query.dart';
 
 class DocumentSearchBar extends StatefulWidget {
   final void Function(SearchQuery) onSearch;

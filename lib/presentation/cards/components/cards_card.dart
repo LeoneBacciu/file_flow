@@ -1,7 +1,8 @@
-import 'package:file_flow/core/components/common.dart';
-import 'package:file_flow/models/document.dart';
-import 'package:file_flow/presentation/preview/preview_page.dart';
 import 'package:flutter/material.dart';
+
+import '../../../core/components/common.dart';
+import '../../../models/document.dart';
+import '../../preview/preview_page.dart';
 
 class CardsCard extends StatelessWidget {
   final Document document;

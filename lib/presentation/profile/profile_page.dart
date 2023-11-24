@@ -1,18 +1,18 @@
 import 'dart:math';
 
-import 'package:file_flow/core/components/document_search_bar.dart';
-import 'package:file_flow/core/components/search_query_state.dart';
-import 'package:file_flow/core/components/stateful_indexed_page.dart';
-import 'package:file_flow/core/components/common.dart';
-import 'package:file_flow/models/document.dart';
-import 'package:file_flow/presentation/preview/preview_page.dart';
-import 'package:file_flow/presentation/profile/components/profile_overview.dart';
-import 'package:file_flow/state/sync/sync_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 
+import '../../core/components/common.dart';
+import '../../core/components/document_search_bar.dart';
+import '../../core/components/search_query_state.dart';
 import '../../core/components/separator.dart';
+import '../../core/components/stateful_indexed_page.dart';
+import '../../models/document.dart';
+import '../../state/sync/sync_cubit.dart';
+import '../preview/preview_page.dart';
+import 'components/profile_overview.dart';
 
 class ProfilePage extends StatefulIndexedPage {
   const ProfilePage({

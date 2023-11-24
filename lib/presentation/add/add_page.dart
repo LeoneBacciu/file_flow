@@ -1,16 +1,16 @@
 import 'dart:io';
 
-import 'package:file_flow/core/components/forms/category_dropdown_field.dart';
-import 'package:file_flow/core/components/forms/content_form_field.dart';
-import 'package:file_flow/core/components/forms/filename_text_field.dart';
-import 'package:file_flow/core/components/forms/images_selector_field.dart';
-import 'package:file_flow/core/components/forms/tag_selector_field.dart';
-import 'package:file_flow/core/translations.dart';
-import 'package:file_flow/models/document.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../core/components/forms/category_dropdown_field.dart';
+import '../../core/components/forms/content_form_field.dart';
+import '../../core/components/forms/filename_text_field.dart';
+import '../../core/components/forms/images_selector_field.dart';
+import '../../core/components/forms/tag_selector_field.dart';
 import '../../core/components/separator.dart';
+import '../../core/translations.dart';
+import '../../models/document.dart';
 import '../../state/sync/sync_cubit.dart';
 
 class AddPage extends StatefulWidget {

@@ -1,11 +1,11 @@
 import 'dart:io';
 
-import 'package:file_flow/core/functions.dart';
-import 'package:file_flow/core/optimistic_call.dart';
-import 'package:file_flow/models/document.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 
+import '../core/functions.dart';
+import '../core/optimistic_call.dart';
+import '../models/document.dart';
 import 'drive_repository.dart';
 
 class SyncRepository {

@@ -1,4 +1,4 @@
-import 'package:file_flow/models/document.dart';
+import 'document.dart';
 
 class SearchQuery {
   final String _query;

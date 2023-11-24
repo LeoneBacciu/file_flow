@@ -1,14 +1,14 @@
+import 'dart:developer' as dev;
 import 'dart:io';
 
-import 'package:file_flow/core/functions.dart';
 import 'package:flutter/material.dart';
-import 'dart:developer' as dev;
-import 'package:file_flow/models/document.dart';
 import 'package:flutter/services.dart';
 import 'package:google_mlkit_barcode_scanning/google_mlkit_barcode_scanning.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 
+import '../../../models/document.dart';
 import '../../date_ui.dart';
+import '../../functions.dart';
 import '../separator.dart';
 
 typedef DocumentContentState = FormFieldState<DocumentContent>;
@@ -57,7 +57,7 @@ class _ContentFormFieldState extends State<ContentFormField> {
               controller: dateInput,
               decoration: const InputDecoration(
                 border: OutlineInputBorder(),
-                labelText: "Conferma la data",
+                labelText: 'Conferma la data',
               ),
               readOnly: true,
               onTap: () async {
@@ -81,10 +81,10 @@ class _ContentFormFieldState extends State<ContentFormField> {
             keyboardType: const TextInputType.numberWithOptions(decimal: true),
             decoration: const InputDecoration(
               border: OutlineInputBorder(),
-              labelText: "Conferma il costo",
+              labelText: 'Conferma il costo',
             ),
             inputFormatters: <TextInputFormatter>[
-              FilteringTextInputFormatter.allow(RegExp(r"[0-9.]")),
+              FilteringTextInputFormatter.allow(RegExp(r'[0-9.]')),
             ],
             onChanged: (a) => updateState(amount: double.parse(a)),
           ),
@@ -104,9 +104,9 @@ class _ContentFormFieldState extends State<ContentFormField> {
     String text = recognizedText.text.toLowerCase();
 
     final dateRegex = RegExp(
-        r"(0[1-9]|[12][0-9]|3[01])[- /.](0[1-9]|1[012])[- /.](19|20)\d\d");
+        r'(0[1-9]|[12][0-9]|3[01])[- /.](0[1-9]|1[012])[- /.](19|20)\d\d');
 
-    final amountRegex = RegExp(r"(\d+[.|,]\d\d)");
+    final amountRegex = RegExp(r'(\d+[.|,]\d\d)');
 
     // print(text);
     // print(
@@ -124,7 +124,7 @@ class _ContentFormFieldState extends State<ContentFormField> {
       try {
         final formatted = text
             .substring(dateMatch.start, dateMatch.end)
-            .replaceAll(RegExp(r"[- .]"), '/');
+            .replaceAll(RegExp(r'[- .]'), '/');
         date = DateUi.parse(formatted);
       } catch (e) {
         dev.log('Wrong date format');
@@ -135,7 +135,7 @@ class _ContentFormFieldState extends State<ContentFormField> {
       try {
         final formatted = text
             .substring(amountMatch.start, amountMatch.end)
-            .replaceAll(RegExp(r","), '.');
+            .replaceAll(RegExp(r','), '.');
         amount = double.parse(formatted);
       } catch (e) {
         dev.log('Wrong double format');

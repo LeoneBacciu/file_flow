@@ -3,9 +3,10 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:equatable/equatable.dart';
-import 'package:file_flow/core/functions.dart';
 import 'package:flutter/material.dart';
 import 'package:path/path.dart';
+
+import '../core/functions.dart';
 
 typedef DocumentListEditable = List<Document>;
 typedef DocumentList = UnmodifiableListView<Document>;

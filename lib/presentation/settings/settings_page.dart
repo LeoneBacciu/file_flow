@@ -1,9 +1,8 @@
-import 'package:file_flow/core/components/common.dart';
-import 'package:file_flow/core/components/stateful_indexed_page.dart';
-
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 
+import '../../core/components/common.dart';
+import '../../core/components/stateful_indexed_page.dart';
 import '../../repositories/drive_repository.dart';
 import '../../repositories/sync_repository.dart';
 

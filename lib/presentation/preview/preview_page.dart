@@ -1,14 +1,14 @@
-import 'package:file_flow/core/components/common.dart';
-import 'package:file_flow/models/document.dart';
-import 'package:file_flow/presentation/edit/edit_page.dart';
-import 'package:file_flow/presentation/preview/components/delete_dialog.dart';
-import 'package:file_flow/presentation/preview/components/images_preview.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:share_plus/share_plus.dart';
 
+import '../../core/components/common.dart';
+import '../../models/document.dart';
 import '../../state/sync/sync_cubit.dart';
+import '../edit/edit_page.dart';
+import 'components/delete_dialog.dart';
+import 'components/images_preview.dart';
 
 class PreviewPage extends StatefulWidget {
   final Document document;
@@ -33,7 +33,6 @@ class _PreviewPageState extends State<PreviewPage> {
           final renderBox =
               _headerKey.currentContext!.findRenderObject() as RenderBox;
           headerHeight = renderBox.size.height;
-          print(renderBox.size);
         }),
       );
     }

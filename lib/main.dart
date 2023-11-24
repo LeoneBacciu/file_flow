@@ -3,20 +3,20 @@ import 'dart:developer' as dev;
 
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
-import 'package:file_flow/models/document.dart';
-import 'package:file_flow/presentation/add/add_page.dart';
-import 'package:file_flow/presentation/settings/settings_page.dart';
-import 'package:file_flow/repositories/locator.dart';
-import 'package:file_flow/state/sync/sync_cubit.dart';
-import 'package:file_flow/state/user/user_cubit.dart';
 import 'package:flutter/material.dart';
-import 'package:file_flow/core/components/common.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import 'core/components/common.dart';
+import 'models/document.dart';
+import 'presentation/add/add_page.dart';
 import 'presentation/bank/bank_page.dart';
 import 'presentation/bills/bills_page.dart';
-import 'presentation/profile/profile_page.dart';
 import 'presentation/cards/cards_page.dart';
+import 'presentation/profile/profile_page.dart';
+import 'presentation/settings/settings_page.dart';
+import 'repositories/locator.dart';
+import 'state/sync/sync_cubit.dart';
+import 'state/user/user_cubit.dart';
 
 void main() async {
   runZonedGuarded(() {

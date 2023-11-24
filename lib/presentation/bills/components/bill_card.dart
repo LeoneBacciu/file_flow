@@ -1,8 +1,8 @@
-import 'package:file_flow/core/components/common.dart';
-import 'package:file_flow/models/document.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
+import '../../../core/components/common.dart';
+import '../../../models/document.dart';
 import '../../preview/preview_page.dart';
 
 class BillCard extends StatelessWidget {

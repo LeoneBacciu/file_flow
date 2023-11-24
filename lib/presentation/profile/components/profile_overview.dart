@@ -1,13 +1,14 @@
 import 'dart:math';
 
-import 'package:file_flow/core/convert.dart';
-import 'package:file_flow/presentation/profile/components/account_sheet.dart';
-import 'package:file_flow/state/user/user_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:wave/config.dart';
 import 'package:wave/wave.dart';
+
+import '../../../core/convert.dart';
+import '../../../state/user/user_cubit.dart';
+import 'account_sheet.dart';
 
 class ProfileOverview extends StatelessWidget {
   ProfileOverview({super.key});

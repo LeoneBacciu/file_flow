@@ -1,15 +1,15 @@
-import 'package:equatable/equatable.dart';
-import 'package:file_flow/core/optimistic_call.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:get_it/get_it.dart';
 import 'dart:developer' as dev;
 
+import 'package:equatable/equatable.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:get_it/get_it.dart';
+
+import '../../core/optimistic_call.dart';
 import '../../models/document.dart';
 import '../../repositories/sync_repository.dart';
 
-part 'sync_state.dart';
-
 part 'sync_provider.dart';
+part 'sync_state.dart';
 
 class SyncCubit extends Cubit<SyncState> {
   final SyncRepository syncRepository;

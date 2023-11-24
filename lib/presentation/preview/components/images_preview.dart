@@ -1,8 +1,9 @@
 import 'dart:io';
 
-import 'package:file_flow/core/components/common.dart';
 import 'package:flutter/material.dart';
 import 'package:share_plus/share_plus.dart';
+
+import '../../../core/components/common.dart';
 
 class ImagesPreview extends StatelessWidget {
   final List<File> images;

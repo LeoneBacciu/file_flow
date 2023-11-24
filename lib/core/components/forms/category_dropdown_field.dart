@@ -1,6 +1,6 @@
-import 'package:file_flow/models/document.dart';
 import 'package:flutter/material.dart';
 
+import '../../../models/document.dart';
 import '../../translations.dart';
 
 
