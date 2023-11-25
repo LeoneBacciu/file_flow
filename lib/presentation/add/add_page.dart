@@ -9,7 +9,6 @@ import '../../core/components/forms/filename_text_field.dart';
 import '../../core/components/forms/images_selector_field.dart';
 import '../../core/components/forms/tag_selector_field.dart';
 import '../../core/components/separator.dart';
-import '../../core/translations.dart';
 import '../../models/document.dart';
 import '../../state/sync/sync_cubit.dart';
 
@@ -33,7 +32,7 @@ class _AddPageState extends State<AddPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Aggiungi ${translateCategory[category.jsonValue]!}'),
+        title: Text('Aggiungi ${category.displayName}'),
       ),
       body: SafeArea(
         child: SingleChildScrollView(

@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../../../models/document.dart';
-import '../../translations.dart';
-
 
 class CategoryDropdownField extends StatefulWidget {
   final DocumentCategory? initialValue;
@@ -26,11 +24,10 @@ class _CategoryDropdownFieldState extends State<CategoryDropdownField> {
           if (c != null) widget.onChange?.call(c);
         },
         dropdownMenuEntries: DocumentCategory.list()
-            .map((value) =>
-            DropdownMenuEntry<DocumentCategory>(
-              value: value,
-              label: translateCategory[value.jsonValue]!,
-            ))
+            .map((value) => DropdownMenuEntry<DocumentCategory>(
+                  value: value,
+                  label: value.displayName,
+                ))
             .toList(),
       ),
     );
