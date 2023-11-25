@@ -35,7 +35,7 @@ enum DocumentCategory {
   ),
   other(
     'other',
-    'Altro',
+    'Vario',
     Icons.description,
     {},
   );
@@ -212,11 +212,6 @@ extension DocumentListEditableExtension on DocumentListEditable {
       this[indexWhere((d) => d.uuid == document.uuid)] = document;
 
   String serialize() => json.encode(map((d) => d.toJson()).toList());
-
-  DocumentListEditable sorted(int Function(Document a, Document b) compare) {
-    sort(compare);
-    return this;
-  }
 
   DocumentList frozen() => UnmodifiableListView(this);
 }
