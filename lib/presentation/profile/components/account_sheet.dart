@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../state/sync/sync_cubit.dart';
 import '../../../state/user/user_cubit.dart';
 
 class AccountSheet extends StatelessWidget {
@@ -12,9 +13,10 @@ class AccountSheet extends StatelessWidget {
       shrinkWrap: true,
       children: [
         ListTile(
-          leading: const Icon(Icons.logout),
-          title: const Text('Sign Out'),
+          leading: const Icon(Icons.switch_account),
+          title: const Text('Cambia Profilo'),
           onTap: () {
+            BlocProvider.of<SyncCubit>(context).signOut();
             BlocProvider.of<UserCubit>(context).signOut();
             Navigator.of(context).pop();
           },

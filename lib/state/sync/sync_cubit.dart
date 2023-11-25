@@ -113,6 +113,11 @@ class SyncCubit extends Cubit<SyncState> {
     }
   }
 
+  void signOut() async {
+    await syncRepository.clearAll();
+    emit(SyncUnsynced());
+  }
+
   @override
   void onChange(Change<SyncState> change) {
     super.onChange(change);
