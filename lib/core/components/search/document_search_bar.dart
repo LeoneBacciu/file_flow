@@ -1,22 +1,19 @@
 import 'package:flutter/material.dart';
 
-import '../../models/document.dart';
-import '../../models/search_query.dart';
+import '../../../models/document.dart';
+import 'search_context.dart';
+import 'search_dialog.dart';
 
 class DocumentSearchBar extends StatefulWidget {
-  final void Function(SearchQuery) onSearch;
-  final DocumentCategory? category;
+  final TagSet tags;
 
-  const DocumentSearchBar({super.key, required this.onSearch, this.category});
+  const DocumentSearchBar({super.key, required this.tags});
 
   @override
   State<DocumentSearchBar> createState() => _DocumentSearchBarState();
 }
 
 class _DocumentSearchBarState extends State<DocumentSearchBar> {
-  // ignore: unused_field
-  late SearchQuery _query = SearchQuery('', widget.category);
-
   @override
   Widget build(BuildContext context) {
     return SliverAppBar(
@@ -31,13 +28,17 @@ class _DocumentSearchBarState extends State<DocumentSearchBar> {
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
               child: SearchBar(
-                onChanged: (text) => widget
-                    .onSearch(_query = SearchQuery(text, widget.category)),
+                onChanged: (q) => SearchContext.of(context).query = q,
                 padding: const MaterialStatePropertyAll<EdgeInsets>(
                   EdgeInsets.symmetric(horizontal: 16.0),
                 ),
                 leading: const Icon(Icons.search),
-                trailing: const [Icon(Icons.tune)],
+                trailing: [
+                  IconButton(
+                    onPressed: () => _buildSearchDialog(context),
+                    icon: const Icon(Icons.tune),
+                  ),
+                ],
               ),
             ),
           ),
@@ -51,6 +52,16 @@ class _DocumentSearchBarState extends State<DocumentSearchBar> {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  void _buildSearchDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (_) => SearchContext(
+        notifier: SearchContext.of(context),
+        child: SearchDialog(tags: widget.tags),
       ),
     );
   }
