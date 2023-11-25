@@ -119,26 +119,27 @@ class _PreviewPageState extends State<PreviewPage> {
           Wrap(
             alignment: WrapAlignment.center,
             spacing: 8,
-            children: widget.document.content!.qrs.map(
-              (u) {
-                if (u.startsWith('http')) {
-                  final uri = Uri.parse(u);
-                  return ActionChip(
-                    avatar: const Icon(Icons.public),
-                    label: Text(uri.host),
-                    onPressed: () => Share.shareUri(uri),
-                  );
-                } else {
-                  return ActionChip(
-                    avatar: const Icon(Icons.text_fields),
-                    label: Text(u),
-                    onPressed: () => Clipboard.setData(
-                      ClipboardData(text: u),
-                    ),
-                  );
-                }
-              },
-            ).toList(),
+            children: widget.document.content?.qrs.map(
+                  (u) {
+                    if (u.startsWith('http')) {
+                      final uri = Uri.parse(u);
+                      return ActionChip(
+                        avatar: const Icon(Icons.public),
+                        label: Text(uri.host),
+                        onPressed: () => Share.shareUri(uri),
+                      );
+                    } else {
+                      return ActionChip(
+                        avatar: const Icon(Icons.text_fields),
+                        label: Text(u),
+                        onPressed: () => Clipboard.setData(
+                          ClipboardData(text: u),
+                        ),
+                      );
+                    }
+                  },
+                ).toList() ??
+                [],
           ),
           Wrap(
             alignment: WrapAlignment.center,
