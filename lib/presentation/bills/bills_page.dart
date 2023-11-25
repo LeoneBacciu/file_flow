@@ -1,12 +1,13 @@
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../core/components/common.dart';
-import '../../core/components/document_search_bar.dart';
-import '../../core/components/search_query_state.dart';
+import '../../core/components/search/document_search_bar.dart';
+import '../../core/components/search/search_context.dart';
+import '../../core/components/search/search_notifier.dart';
 import '../../core/components/stateful_indexed_page.dart';
 import '../../models/document.dart';
-import '../../models/search_query.dart';
 import '../../state/sync/sync_cubit.dart';
 import 'components/bill_card.dart';
 
@@ -21,41 +22,49 @@ class BillsPage extends StatefulIndexedPage {
   State<BillsPage> createState() => _BillsPageState();
 }
 
-class _BillsPageState extends SearchQueryState<BillsPage> {
-  @override
-  SearchQuery get initialQuery =>
-      SearchQuery.cleanWithCategory(DocumentCategory.bill);
+class _BillsPageState extends State<BillsPage> {
+  final notifier = SearchNotifier(DocumentCategory.bill);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child: BlocBuilder<SyncCubit, SyncState>(
-          builder: (context, state) {
-            return CustomScrollView(
-              slivers: [
-                DocumentSearchBar(
-                  onSearch: querySearch,
-                  category: DocumentCategory.bill,
-                ),
-                SliverList.list(
-                  children: (state is SyncLoaded)
-                      ? state.documents
-                      .where(queryFilter)
-                      .map((d) => BillCard(document: d))
-                      .toList()
-                      : [],
-                ),
-                const SliverToBoxAdapter(child: SizedBox(height: 1000)), //TODO: Remove
-              ],
-            );
-          },
+        child: SearchContext(
+          notifier: notifier,
+          child: BlocBuilder<SyncCubit, SyncState>(
+            builder: (context, state) {
+              return CustomScrollView(
+                slivers: [
+                  DocumentSearchBar(
+                    tags: (state is SyncLoaded)
+                        ? state.documents
+                            .where((d) => d.category == DocumentCategory.bill)
+                            .toList()
+                            .extractTags()
+                        : {},
+                  ),
+                  SliverList.list(
+                    children: (state is SyncLoaded)
+                        ? state.documents
+                            .unfrozen()
+                            .where(SearchContext.of(context).filter)
+                            .sorted(SearchContext.of(context).order)
+                            .map((d) => BillCard(document: d))
+                            .toList()
+                        : [],
+                  ),
+                  const SliverToBoxAdapter(child: SizedBox(height: 1000)),
+                  //TODO: Remove
+                ],
+              );
+            },
+          ),
         ),
       ),
       floatingActionButton: commonFloatingActionButton(
         context,
         NavigationRoute.bills,
-            () => widget.onNewDocument!(DocumentCategory.bill),
+        () => widget.onNewDocument!(DocumentCategory.bill),
       ),
       bottomNavigationBar: commonNavigationBar(
         context,
