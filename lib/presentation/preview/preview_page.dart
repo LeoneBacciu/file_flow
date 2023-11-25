@@ -72,15 +72,14 @@ class _PreviewPageState extends State<PreviewPage> {
       body: SafeArea(
         child: CustomScrollView(
           slivers: [
-            if (widget.document.content != null)
-              SliverAppBar(
-                expandedHeight: headerHeight,
-                collapsedHeight: headerHeight,
-                floating: true,
-                automaticallyImplyLeading: false,
-                flexibleSpace:
-                    headerHeight != null ? _buildHeader() : const SizedBox(),
-              ),
+            SliverAppBar(
+              expandedHeight: headerHeight,
+              collapsedHeight: headerHeight,
+              floating: true,
+              automaticallyImplyLeading: false,
+              flexibleSpace:
+                  headerHeight != null ? _buildHeader() : const SizedBox(),
+            ),
             ImagesPreview(
               heroRoute: widget.heroRoute,
               images: widget.document.files,
