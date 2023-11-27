@@ -4,7 +4,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
 
-import '../../core/optimistic_call.dart';
+import '../../core/optimistic_update.dart';
 import '../../models/document.dart';
 import '../../repositories/sync_repository.dart';
 
@@ -87,7 +87,7 @@ class SyncCubit extends Cubit<SyncState> {
     }
   }
 
-  void deleteDocument(Document document) async {
+  void removeDocument(Document document) async {
     final lastState = state;
     emit(SyncLoadedSyncing(
         lastState is SyncLoaded ? lastState.documents : emptyList));
@@ -96,7 +96,7 @@ class SyncCubit extends Cubit<SyncState> {
       final onlineDocs = await syncRepository.loadOnline();
       emit(SyncLoadedSyncing(onlineDocs));
 
-      final optimisticCall = await syncRepository.deleteDocument(
+      final optimisticCall = await syncRepository.removeDocument(
           onlineDocs, onlineDocs.getUuid(document.uuid)!);
       emit(SyncLoadedSyncing(optimisticCall.getValue()));
       final (docs, state) = await optimisticCall.getResult();
@@ -113,8 +113,8 @@ class SyncCubit extends Cubit<SyncState> {
     }
   }
 
-  void signOut() async {
-    await syncRepository.clearAll();
+  void clearCache() async {
+    await syncRepository.clearLocal();
     emit(SyncUnsynced());
   }
 

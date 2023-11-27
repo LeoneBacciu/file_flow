@@ -2,7 +2,7 @@ import 'dart:async';
 
 enum OptimisticResultState { success, failed }
 
-class OptimisticCall<T> {
+class OptimisticUpdate<T> {
   final T value;
   final Future<void> Function(T) onSend;
   final Future<void> Function(T)? onSuccess;
@@ -10,7 +10,7 @@ class OptimisticCall<T> {
 
   final Completer<(T, OptimisticResultState)> completer = Completer();
 
-  OptimisticCall(
+  OptimisticUpdate(
       {required this.value,
       required this.onSend,
       required this.onError,

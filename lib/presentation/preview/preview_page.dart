@@ -7,8 +7,8 @@ import '../../core/components/common.dart';
 import '../../models/document.dart';
 import '../../state/sync/sync_cubit.dart';
 import '../edit/edit_page.dart';
-import 'components/delete_dialog.dart';
 import 'components/images_preview.dart';
+import 'components/remove_dialog.dart';
 
 class PreviewPage extends StatefulWidget {
   final Document document;
@@ -56,11 +56,11 @@ class _PreviewPageState extends State<PreviewPage> {
             onPressed: () {
               showDialog<bool>(
                 context: context,
-                builder: (context) => const DeleteDialog(),
+                builder: (context) => const RemoveDialog(),
               ).then((d) {
                 if (d == true) {
                   BlocProvider.of<SyncCubit>(context)
-                      .deleteDocument(widget.document);
+                      .removeDocument(widget.document);
                   Navigator.of(context).pop();
                 }
               });

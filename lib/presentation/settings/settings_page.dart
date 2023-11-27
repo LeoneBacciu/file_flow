@@ -27,7 +27,7 @@ class _SettingsPageState extends State<SettingsPage> {
           children: [
             ElevatedButton(
               onPressed: () {
-                GetIt.instance<DriveRepository>().deleteAll();
+                GetIt.instance<DriveRepository>().clearRemote();
               },
               child: const Text(
                 'Reset Remote',
@@ -36,7 +36,7 @@ class _SettingsPageState extends State<SettingsPage> {
             ),
             ElevatedButton(
               onPressed: () {
-                GetIt.instance<SyncRepository>().clearAll();
+                GetIt.instance<SyncRepository>().clearLocal();
               },
               child: const Text('Reset Local'),
             ),

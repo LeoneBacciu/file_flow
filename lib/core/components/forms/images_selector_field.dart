@@ -105,7 +105,7 @@ class _ImagesSelectorFieldState extends State<ImagesSelectorField> {
                         child: const Icon(Icons.edit),
                       ),
                       ElevatedButton(
-                        onPressed: () => deleteImage(index),
+                        onPressed: () => removeImage(index),
                         style: ElevatedButton.styleFrom(
                           shape: const CircleBorder(),
                           padding: const EdgeInsets.all(8),
@@ -144,7 +144,7 @@ class _ImagesSelectorFieldState extends State<ImagesSelectorField> {
     }
   }
 
-  Future<void> deleteImage(int index) async {
+  Future<void> removeImage(int index) async {
     setState(() {
       images.removeAt(index);
     });

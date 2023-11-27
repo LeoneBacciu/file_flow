@@ -173,14 +173,15 @@ class DriveRepository {
     ));
   }
 
-  Future<void> deleteFile(File file) async {
+  Future<void> removeFile(File file) async {
     final api = await driveApi;
 
     final filesFolder = await getOrCreateFilesFolder();
 
     final remoteFiles = await api.files.list(
       spaces: appDataFolder,
-      q: "'${filesFolder.id}' in parents and name = '${basename(file.path)}' and mimeType != '$folderMimeType'",
+      q: "'${filesFolder.id}' in parents and name = '${basename(
+          file.path)}' and mimeType != '$folderMimeType'",
       $fields: defaultFileFields,
     );
 
@@ -205,7 +206,7 @@ class DriveRepository {
         .map((f) => api.files.delete(f.id!)));
   }
 
-  Future<void> deleteFiles(List<File> files) async {
+  Future<void> removeFiles(List<File> files) async {
     final api = await driveApi;
 
     final filesFolder = await getOrCreateFilesFolder();
@@ -213,7 +214,8 @@ class DriveRepository {
     for (final localFile in files) {
       final remoteFiles = await api.files.list(
         spaces: appDataFolder,
-        q: "'${filesFolder.id}' in parents and name = '${basename(localFile.path)}' and mimeType != '$folderMimeType'",
+        q: "'${filesFolder.id}' in parents and name = '${basename(
+            localFile.path)}' and mimeType != '$folderMimeType'",
         $fields: defaultFileFields,
       );
 
@@ -223,7 +225,7 @@ class DriveRepository {
     }
   }
 
-  Future<void> deleteAll() async {
+  Future<void> clearRemote() async {
     final api = await driveApi;
 
     final remoteFiles = await api.files.list(
@@ -232,7 +234,7 @@ class DriveRepository {
     );
 
     await Future.wait(remoteFiles.files!.map(
-      (remoteFile) => api.files.delete(remoteFile.id!),
+          (remoteFile) => api.files.delete(remoteFile.id!),
     ));
   }
 }

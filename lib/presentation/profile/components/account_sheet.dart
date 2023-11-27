@@ -16,7 +16,7 @@ class AccountSheet extends StatelessWidget {
           leading: const Icon(Icons.switch_account),
           title: const Text('Cambia Profilo'),
           onTap: () {
-            BlocProvider.of<SyncCubit>(context).signOut();
+            BlocProvider.of<SyncCubit>(context).clearCache();
             BlocProvider.of<UserCubit>(context).signOut();
             Navigator.of(context).pop();
           },
