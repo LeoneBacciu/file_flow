@@ -34,6 +34,7 @@ class _ContentFormFieldState extends State<ContentFormField> {
     ..text = widget.initialValue?.date.apply(DateUi.format) ?? '';
   late final amountInput = TextEditingController()
     ..text = widget.initialValue?.amount.toStringAsFixed(2) ?? '';
+  bool dateError = false, amountError = false;
 
   late DocumentContent documentContent = widget.initialValue ??
       DocumentContent(date: DateTime.now(), amount: 0, qrs: const []);
@@ -41,8 +42,11 @@ class _ContentFormFieldState extends State<ContentFormField> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance
-        .addPostFrameCallback((_) => extractData(widget.source));
+    if (widget.initialValue == null) {
+      WidgetsBinding.instance.addPostFrameCallback(
+        (_) => extractData(widget.source),
+      );
+    }
   }
 
   @override
@@ -55,20 +59,25 @@ class _ContentFormFieldState extends State<ContentFormField> {
           child: Builder(builder: (context) {
             return TextField(
               controller: dateInput,
-              decoration: const InputDecoration(
-                border: OutlineInputBorder(),
+              decoration: InputDecoration(
+                border: const OutlineInputBorder(),
                 labelText: 'Conferma la data',
+                errorText: dateError ? 'Data mancante' : null,
               ),
               readOnly: true,
               onTap: () async {
                 DateTime? pickedDate = await showDatePicker(
                   context: context,
-                  initialDate: DateTime.now(),
+                  initialDate: dateInput.text.isNotEmpty
+                      ? DateUi.parse(dateInput.text)
+                      : DateTime.now(),
                   firstDate: DateTime(2000),
                   lastDate: DateTime(2101),
                 );
 
-                if (pickedDate != null) updateState(date: pickedDate);
+                if (pickedDate != null) {
+                  updateState(date: DateUi.format(pickedDate));
+                }
               },
             );
           }),
@@ -79,14 +88,15 @@ class _ContentFormFieldState extends State<ContentFormField> {
           child: TextFormField(
             controller: amountInput,
             keyboardType: const TextInputType.numberWithOptions(decimal: true),
-            decoration: const InputDecoration(
-              border: OutlineInputBorder(),
+            decoration: InputDecoration(
+              border: const OutlineInputBorder(),
               labelText: 'Conferma il costo',
+              errorText: amountError ? 'Invalid amount' : null,
             ),
             inputFormatters: <TextInputFormatter>[
               FilteringTextInputFormatter.allow(RegExp(r'[0-9.]')),
             ],
-            onChanged: (a) => updateState(amount: double.parse(a)),
+            onChanged: (a) => updateState(),
           ),
         )
       ],
@@ -162,14 +172,41 @@ class _ContentFormFieldState extends State<ContentFormField> {
 
     barcodeScanner.close();
 
-    updateState(date: date, amount: amount, qrs: qrs);
+    updateState(
+      date: date.apply(DateUi.format),
+      amount: amount?.toStringAsFixed(2),
+      qrs: qrs,
+    );
   }
 
-  void updateState({DateTime? date, double? amount, List<String>? qrs}) {
-    if (date != null) dateInput.text = DateUi.format(date);
-    if (amount != null) amountInput.text = amount.toStringAsFixed(2);
-    setState(() => documentContent =
-        documentContent.copyWith(date: date, amount: amount, qrs: qrs));
-    widget.onChange?.call(documentContent);
+  void updateState({String? date, String? amount, List<String>? qrs}) {
+    if (date != null) dateInput.text = date;
+    if (amount != null) amountInput.text = amount;
+    DateTime? parsedDate;
+    double? parsedAmount;
+    try {
+      parsedDate = DateUi.parse(dateInput.text);
+      setState(() => dateError = false);
+    } catch (e) {
+      dev.log(e.toString());
+      setState(() => dateError = true);
+    }
+    try {
+      parsedAmount = double.parse(amountInput.text);
+      setState(() => amountError = false);
+    } catch (e) {
+      setState(() => amountError = true);
+    }
+
+    if (parsedDate != null && parsedAmount != null) {
+      setState(
+        () => documentContent = documentContent.copyWith(
+          date: parsedDate,
+          amount: parsedAmount,
+          qrs: qrs,
+        ),
+      );
+      widget.onChange?.call(documentContent);
+    }
   }
 }
