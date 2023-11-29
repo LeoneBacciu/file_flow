@@ -30,7 +30,7 @@ enum DocumentCategory {
     'bank',
     'Banca',
     Icons.attach_money,
-    {},
+    {'Estratto Conto'},
     true,
   ),
   other(
