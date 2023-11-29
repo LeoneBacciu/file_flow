@@ -10,6 +10,7 @@ import '../../core/components/stateful_indexed_page.dart';
 import '../../models/document.dart';
 import '../../state/sync/sync_cubit.dart';
 import 'components/bill_card.dart';
+import 'components/bills_plot.dart';
 
 class BillsPage extends StatefulIndexedPage {
   const BillsPage({
@@ -43,6 +44,13 @@ class _BillsPageState extends State<BillsPage> {
                             .extractTags()
                         : {},
                   ),
+                  if (state is SyncLoaded)
+                    BillsPlot(
+                      documents: state.documents
+                          .where(SearchContext.of(context).filter)
+                          .toList()
+                          .frozen(),
+                    ),
                   SliverList.list(
                     children: (state is SyncLoaded)
                         ? state.documents

@@ -194,7 +194,7 @@ class DocumentContent extends Equatable {
 extension DocumentListEditableExtension on DocumentListEditable {
   List<File> extractFiles() => expand((d) => d.files).toList();
 
-  Set<String> extractTags() => expand((d) => d.tags).toSet();
+  TagSet extractTags() => expand((d) => d.tags).toSet();
 
   Document? getUuid(String uuid) =>
       cast<Document?>().firstWhere((d) => d!.uuid == uuid, orElse: () => null);
