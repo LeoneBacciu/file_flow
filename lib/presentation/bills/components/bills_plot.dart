@@ -66,10 +66,18 @@ class BillsPlot extends StatelessWidget {
             (d) => d.content!.date.isAfter(initialDate),
           )
           .expand(
-            (d) => d.tags.map(
-              (t) => DocumentPlotElement(
-                  d.content!.date, d.content!.amount / d.tags.length, t),
-            ),
+            (d) => d.tags.isEmpty
+                ? [
+                    DocumentPlotElement(
+                      d.content!.date,
+                      d.content!.amount,
+                      'Untagged',
+                    )
+                  ]
+                : d.tags.map(
+                    (t) => DocumentPlotElement(
+                        d.content!.date, d.content!.amount / d.tags.length, t),
+                  ),
           ),
       (de) => de.tag,
     );
