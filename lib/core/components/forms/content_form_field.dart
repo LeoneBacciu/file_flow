@@ -7,7 +7,7 @@ import 'package:google_mlkit_barcode_scanning/google_mlkit_barcode_scanning.dart
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 
 import '../../../models/document.dart';
-import '../../date_ui.dart';
+import '../../date_misc.dart';
 import '../../functions.dart';
 import '../separator.dart';
 
@@ -31,7 +31,7 @@ class ContentFormField extends StatefulWidget {
 
 class _ContentFormFieldState extends State<ContentFormField> {
   late final dateInput = TextEditingController()
-    ..text = widget.initialValue?.date.apply(DateUi.format) ?? '';
+    ..text = widget.initialValue?.date.apply(DateMisc.format) ?? '';
   late final amountInput = TextEditingController()
     ..text = widget.initialValue?.amount.toStringAsFixed(2) ?? '';
   bool dateError = false, amountError = false;
@@ -69,14 +69,14 @@ class _ContentFormFieldState extends State<ContentFormField> {
                 DateTime? pickedDate = await showDatePicker(
                   context: context,
                   initialDate: dateInput.text.isNotEmpty
-                      ? DateUi.parse(dateInput.text)
+                      ? DateMisc.parse(dateInput.text)
                       : DateTime.now(),
                   firstDate: DateTime(2000),
                   lastDate: DateTime(2101),
                 );
 
                 if (pickedDate != null) {
-                  updateState(date: DateUi.format(pickedDate));
+                  updateState(date: DateMisc.format(pickedDate));
                 }
               },
             );
@@ -135,7 +135,7 @@ class _ContentFormFieldState extends State<ContentFormField> {
         final formatted = text
             .substring(dateMatch.start, dateMatch.end)
             .replaceAll(RegExp(r'[- .]'), '/');
-        date = DateUi.parse(formatted);
+        date = DateMisc.parse(formatted);
       } catch (e) {
         dev.log('Wrong date format');
       }
@@ -173,7 +173,7 @@ class _ContentFormFieldState extends State<ContentFormField> {
     barcodeScanner.close();
 
     updateState(
-      date: date.apply(DateUi.format),
+      date: date.apply(DateMisc.format),
       amount: amount?.toStringAsFixed(2),
       qrs: qrs,
     );
@@ -185,7 +185,7 @@ class _ContentFormFieldState extends State<ContentFormField> {
     DateTime? parsedDate;
     double? parsedAmount;
     try {
-      parsedDate = DateUi.parse(dateInput.text);
+      parsedDate = DateMisc.parse(dateInput.text);
       setState(() => dateError = false);
     } catch (e) {
       dev.log(e.toString());

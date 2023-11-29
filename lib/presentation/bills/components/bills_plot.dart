@@ -3,7 +3,7 @@ import 'package:community_charts_flutter/community_charts_flutter.dart'
     as charts;
 import 'package:flutter/material.dart';
 
-import '../../../core/date_ui.dart';
+import '../../../core/date_misc.dart';
 import '../../../models/document.dart';
 
 class BillsPlot extends StatelessWidget {
@@ -95,6 +95,6 @@ class DocumentPlotElement {
 
   @override
   String toString() {
-    return DateUi.format(date);
+    return DateMisc.format(date);
   }
 }

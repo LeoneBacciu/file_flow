@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 import '../../../models/document.dart';
+import '../../date_misc.dart';
+import '../../functions.dart';
 
 enum SearchSortPolicy {
   lastModified('Ultima Modifica'),
@@ -28,6 +30,8 @@ class SearchNotifier extends ChangeNotifier {
   bool _descending = true;
 
   SearchSortPolicy _policy = SearchSortPolicy.lastModified;
+
+  DateTimeRange? _dateTimeRage;
 
   SearchNotifier([this._category]) : _lockedCategory = _category != null;
 
@@ -88,6 +92,13 @@ class SearchNotifier extends ChangeNotifier {
     }
   }
 
+  DateTimeRange? get dateTimeRange => _dateTimeRage;
+
+  set dateTimeRange(DateTimeRange? dateTimeRange) {
+    _dateTimeRage = dateTimeRange;
+    notifyListeners();
+  }
+
   bool filter(Document document) {
     if (category != null && document.category != category) {
       return false;
@@ -96,6 +107,10 @@ class SearchNotifier extends ChangeNotifier {
       return false;
     }
     if (!document.tags.containsAll(tags)) {
+      return false;
+    }
+    if (dateTimeRange != null &&
+        document.content?.date.apply(dateTimeRange!.contains) == false) {
       return false;
     }
     return true;

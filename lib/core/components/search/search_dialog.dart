@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../models/document.dart';
 import 'search_context.dart';
+import 'search_date_range.dart';
 import 'search_notifier.dart';
 
 class SearchDialog extends StatelessWidget {
@@ -62,19 +63,22 @@ class SearchDialog extends StatelessWidget {
               ),
             ),
             if (notifier.tags.isNotEmpty) _pad(const Text('Tags')),
-            Wrap(
-              spacing: 8,
-              alignment: WrapAlignment.center,
-              children: tags
-                  .map(
-                    (t) => InputChip(
-                      onSelected: (add) => notifier.toggleTag(t, add),
-                      selected: notifier.tags.contains(t),
-                      label: Text(t),
-                    ),
-                  )
-                  .toList(),
-            ),
+            if (notifier.tags.isNotEmpty)
+              Wrap(
+                spacing: 8,
+                alignment: WrapAlignment.center,
+                children: tags
+                    .map(
+                      (t) => InputChip(
+                        onSelected: (add) => notifier.toggleTag(t, add),
+                        selected: notifier.tags.contains(t),
+                        label: Text(t),
+                      ),
+                    )
+                    .toList(),
+              ),
+            if (notifier.category?.parsing ?? false)
+              _pad(const SearchDateRange()),
           ],
         ),
       ),
