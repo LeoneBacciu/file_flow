@@ -7,8 +7,8 @@ import 'package:wave/config.dart';
 import 'package:wave/wave.dart';
 
 import '../../../core/convert.dart';
+import '../../../state/sync/sync_cubit.dart';
 import '../../../state/user/user_cubit.dart';
-import 'account_sheet.dart';
 
 class ProfileOverview extends StatelessWidget {
   ProfileOverview({super.key});
@@ -52,32 +52,25 @@ class ProfileOverview extends StatelessWidget {
                     physics: const NeverScrollableScrollPhysics(),
                     children: [
                       Center(
-                        child: GestureDetector(
-                          onTap: () => showModalBottomSheet(
-                            context: context,
-                            builder: (context) => const AccountSheet(),
-                          ),
-                          child: Container(
-                            margin: const EdgeInsets.only(top: 8),
-                            padding: const EdgeInsets.all(16),
-                            decoration: BoxDecoration(
-                                color: Theme.of(context).colorScheme.primary,
-                                borderRadius: BorderRadius.circular(10),
-                                border: Border.all(
-                                  color:
-                                      Theme.of(context).colorScheme.onPrimary,
-                                  width: 5,
-                                )),
-                            child: Text(
-                              (state is UserSignedIn)
-                                  ? state.account.displayName ??
-                                      state.account.email
-                                  : '',
-                              style: TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
+                        child: Container(
+                          margin: const EdgeInsets.only(top: 8),
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                              color: Theme.of(context).colorScheme.primary,
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(
                                 color: Theme.of(context).colorScheme.onPrimary,
-                              ),
+                                width: 5,
+                              )),
+                          child: Text(
+                            (state is UserSignedIn)
+                                ? state.account.displayName ??
+                                    state.account.email
+                                : '',
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: Theme.of(context).colorScheme.onPrimary,
                             ),
                           ),
                         ),
@@ -109,7 +102,30 @@ class ProfileOverview extends StatelessWidget {
                 },
               ),
             ),
-          )
+          ),
+          Positioned(
+            top: 0,
+            right: 8,
+            child: SafeArea(
+              child: Material(
+                color: Colors.transparent,
+                child: Ink(
+                  decoration: ShapeDecoration(
+                    color: Theme.of(context).colorScheme.surface,
+                    shape: const CircleBorder(),
+                  ),
+                  child: IconButton(
+                    icon: const Icon(Icons.logout),
+                    color: Theme.of(context).colorScheme.onSurface,
+                    onPressed: () {
+                      BlocProvider.of<SyncCubit>(context).clearCache();
+                      BlocProvider.of<UserCubit>(context).signOut();
+                    },
+                  ),
+                ),
+              ),
+            ),
+          ),
         ],
       ),
     );
