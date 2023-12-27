@@ -32,7 +32,7 @@ dependencies:
     sdk: flutter
 
   file_picker: ^6.1.1
-  google_sign_in: ^6.1.6
+  google_sign_in: ^6.2.1
   http: ^1.1.2
   path: ^1.8.3
   path_provider: ^2.1.1
@@ -56,11 +56,15 @@ dependencies:
   animated_text_kit: ^4.2.2
   collection: ^1.18.0
   community_charts_flutter: ^1.0.2
-  flutter_document_scanner: ^1.1.0
+  #  flutter_document_scanner: ^1.1.0
   cunning_document_scanner:
     git:
       url: https://github.com/jachzen/cunning_document_scanner.git
       ref: master
+  flutter_sharing_intent:
+    git:
+      url: https://github.com/bhagat-techind/flutter_sharing_intent.git
+      ref: main
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
