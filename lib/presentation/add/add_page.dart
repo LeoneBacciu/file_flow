@@ -14,15 +14,20 @@ import '../../state/sync/sync_cubit.dart';
 
 class AddPage extends StatefulWidget {
   final DocumentCategory category;
+  final List<File> initialImages;
 
-  const AddPage({super.key, required this.category});
+  const AddPage({
+    super.key,
+    required this.category,
+    this.initialImages = const [],
+  });
 
   @override
   State<AddPage> createState() => _AddPageState();
 }
 
 class _AddPageState extends State<AddPage> {
-  List<File> images = [];
+  late List<File> images = widget.initialImages;
   late DocumentCategory category = widget.category;
   Set<String> tags = {};
   String? name;
@@ -39,6 +44,7 @@ class _AddPageState extends State<AddPage> {
           child: Column(
             children: [
               ImagesSelectorField(
+                initialValue: images,
                 onChange: (i) => setState(() => images = i),
               ),
               CategoryDropdownField(

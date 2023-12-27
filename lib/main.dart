@@ -1,13 +1,17 @@
 import 'dart:async';
 import 'dart:developer' as dev;
+import 'dart:io';
 
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_sharing_intent/flutter_sharing_intent.dart';
+import 'package:flutter_sharing_intent/model/sharing_file.dart';
 
 import 'core/components/common.dart';
 import 'models/document.dart';
+import 'presentation/add/add_loader_page.dart';
 import 'presentation/add/add_page.dart';
 import 'presentation/bank/bank_page.dart';
 import 'presentation/bills/bills_page.dart';
@@ -65,12 +69,34 @@ class HomeStack extends StatefulWidget {
 
 class _HomeStackState extends State<HomeStack> {
   var currentRoute = NavigationRoute.profile;
-  StreamSubscription<ConnectivityResult>? subscription;
+  StreamSubscription<ConnectivityResult>? _connectivitySubscription;
+  late StreamSubscription _intentDataStreamSubscription;
 
   @override
   void initState() {
     super.initState();
     BlocProvider.of<UserCubit>(context).signIn();
+    _intentDataStreamSubscription =
+        FlutterSharingIntent.instance.getMediaStream().listen(
+      (List<SharedFile> value) {
+        if (value.isNotEmpty) openAdd(value);
+      },
+    );
+
+    FlutterSharingIntent.instance.getInitialSharing().then(
+      (List<SharedFile> value) {
+        if (value.isNotEmpty) openAdd(value);
+      },
+    );
+  }
+
+  void openAdd(List<SharedFile> sharedFiles) {
+    final files = sharedFiles.map((e) => File(e.value!)).toList();
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => AddLoaderPage(files: files),
+      ),
+    );
   }
 
   @override
@@ -110,20 +136,22 @@ class _HomeStackState extends State<HomeStack> {
       child: BlocConsumer<UserCubit, UserState>(
         listener: (BuildContext context, UserState state) {
           if (state is UserSignedIn) {
-            subscription = Connectivity()
+            _connectivitySubscription = Connectivity()
                 .onConnectivityChanged
                 .listen((ConnectivityResult result) {
               BlocProvider.of<SyncCubit>(context).load();
             });
           } else {
-            subscription?.cancel();
+            _connectivitySubscription?.cancel();
             BlocProvider.of<UserCubit>(context).signIn();
           }
         },
         builder: (context, state) {
           if (state is! UserSignedIn) {
-            return const Center(
-              child: CircularProgressIndicator(),
+            return const Scaffold(
+              body: Center(
+                child: CircularProgressIndicator(),
+              ),
             );
           }
           return IndexedStack(
@@ -177,7 +205,8 @@ class _HomeStackState extends State<HomeStack> {
 
   @override
   void dispose() {
-    subscription?.cancel();
+    _connectivitySubscription?.cancel();
+    _intentDataStreamSubscription.cancel();
     super.dispose();
   }
 }
