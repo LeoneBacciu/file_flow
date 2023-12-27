@@ -64,6 +64,7 @@ class _TagSelectorFieldState extends State<TagSelectorField> {
                     extraTags.add(t);
                     tags.add(t);
                   });
+                  widget.onChange?.call(tags);
                 }
               });
             },
