@@ -5,7 +5,7 @@
 
     <application
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@mipmap/launcher_icon"
         android:label="file_flow">
         <activity
             android:name=".MainActivity"

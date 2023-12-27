@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../models/document.dart';
+import '../../colors.dart';
 import 'search_context.dart';
 import 'search_dialog.dart';
 
@@ -48,7 +49,7 @@ class _DocumentSearchBarState extends State<DocumentSearchBar> {
             child: Container(
               width: MediaQuery.of(context).size.width,
               height: MediaQuery.of(context).viewPadding.top,
-              color: Colors.blue.shade800,
+              color: lighten(seedColor, 1 / 15),
             ),
           ),
         ],

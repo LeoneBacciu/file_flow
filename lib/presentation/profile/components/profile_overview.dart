@@ -6,6 +6,7 @@ import 'package:share_plus/share_plus.dart';
 import 'package:wave/config.dart';
 import 'package:wave/wave.dart';
 
+import '../../../core/colors.dart';
 import '../../../core/convert.dart';
 import '../../../state/sync/sync_cubit.dart';
 import '../../../state/user/user_cubit.dart';
@@ -15,7 +16,7 @@ class ProfileOverview extends StatelessWidget {
 
   final random = Random();
 
-  final colors = List.generate(8, (i) => Colors.blue[(i + 1) * 100]!);
+  late final colors = List.generate(8, (i) => lighten(seedColor, (8 - i) / 15));
 
   final heightPercentages = List.generate(8, (i) => (i).toDouble() / 10);
 
