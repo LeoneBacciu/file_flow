@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -14,8 +16,7 @@ class PreviewPage extends StatefulWidget {
   final Document document;
   final NavigationRoute heroRoute;
 
-  const PreviewPage(
-      {super.key, required this.document, required this.heroRoute});
+  const PreviewPage({super.key, required this.document, required this.heroRoute});
 
   @override
   State<PreviewPage> createState() => _PreviewPageState();
@@ -29,10 +30,12 @@ class _PreviewPageState extends State<PreviewPage> {
   Widget build(BuildContext context) {
     if (headerHeight == null) {
       WidgetsBinding.instance.addPostFrameCallback(
-        (_) => setState(() {
+            (_) => setState(() {
           final renderBox =
-              _headerKey.currentContext!.findRenderObject() as RenderBox;
-          headerHeight = renderBox.size.height;
+              _headerKey.currentContext?.findRenderObject() as RenderBox?;
+          if (renderBox != null) {
+            headerHeight = max(renderBox.size.height, kToolbarHeight);
+          }
         }),
       );
     }
@@ -72,25 +75,27 @@ class _PreviewPageState extends State<PreviewPage> {
       body: SafeArea(
         child: CustomScrollView(
           slivers: [
-            SliverAppBar(
-              expandedHeight: headerHeight,
-              collapsedHeight: headerHeight,
-              floating: true,
-              automaticallyImplyLeading: false,
-              flexibleSpace:
-                  headerHeight != null ? _buildHeader() : const SizedBox(),
-            ),
+            if (notEmptyHeader())
+              SliverAppBar(
+                expandedHeight: headerHeight,
+                collapsedHeight: headerHeight,
+                floating: true,
+                automaticallyImplyLeading: false,
+                flexibleSpace:
+                    headerHeight != null ? _buildHeader() : const SizedBox(),
+              ),
             ImagesPreview(
               heroRoute: widget.heroRoute,
               images: widget.document.files,
             ),
             // Atrocious hack to compute the height beforehand
-            SliverToBoxAdapter(
-              child: Offstage(
-                offstage: true,
-                child: _buildHeader(_headerKey),
-              ),
-            )
+            if (notEmptyHeader())
+              SliverToBoxAdapter(
+                child: Offstage(
+                  offstage: true,
+                  child: _buildHeader(_headerKey),
+                ),
+              )
           ],
         ),
       ),
@@ -107,6 +112,10 @@ class _PreviewPageState extends State<PreviewPage> {
     );
   }
 
+  bool notEmptyHeader() {
+    return widget.document.tags.isNotEmpty || widget.document.tags.isNotEmpty;
+  }
+
   Widget _buildHeader([Key? key]) {
     return Padding(
       key: key,
@@ -120,24 +129,24 @@ class _PreviewPageState extends State<PreviewPage> {
             spacing: 8,
             children: widget.document.content?.qrs.map(
                   (u) {
-                    if (u.startsWith('http')) {
-                      final uri = Uri.parse(u);
-                      return ActionChip(
-                        avatar: const Icon(Icons.public),
-                        label: Text(uri.host),
-                        onPressed: () => Share.shareUri(uri),
-                      );
-                    } else {
-                      return ActionChip(
-                        avatar: const Icon(Icons.text_fields),
-                        label: Text(u),
-                        onPressed: () => Clipboard.setData(
-                          ClipboardData(text: u),
-                        ),
-                      );
-                    }
-                  },
-                ).toList() ??
+                if (u.startsWith('http')) {
+                  final uri = Uri.parse(u);
+                  return ActionChip(
+                    avatar: const Icon(Icons.public),
+                    label: Text(uri.host),
+                    onPressed: () => Share.shareUri(uri),
+                  );
+                } else {
+                  return ActionChip(
+                    avatar: const Icon(Icons.text_fields),
+                    label: Text(u),
+                    onPressed: () => Clipboard.setData(
+                      ClipboardData(text: u),
+                    ),
+                  );
+                }
+              },
+            ).toList() ??
                 [],
           ),
           Wrap(
@@ -146,11 +155,11 @@ class _PreviewPageState extends State<PreviewPage> {
             children: widget.document.tags
                 .map(
                   (t) => Chip(
-                    label: Text(t),
-                    backgroundColor:
-                        Theme.of(context).colorScheme.secondaryContainer,
-                  ),
-                )
+                label: Text(t),
+                backgroundColor:
+                Theme.of(context).colorScheme.secondaryContainer,
+              ),
+            )
                 .toList(),
           ),
         ],
