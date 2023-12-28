@@ -24,7 +24,7 @@ class ImagesSelectorField extends StatefulWidget {
 }
 
 class _ImagesSelectorFieldState extends State<ImagesSelectorField> {
-  late final images = widget.initialValue ?? [];
+  late final images = [...?widget.initialValue];
 
   @override
   Widget build(BuildContext context) {
