@@ -42,6 +42,7 @@ class _ContentFormFieldState extends State<ContentFormField> {
   @override
   void initState() {
     super.initState();
+    widget.onChange?.call(documentContent);
     if (widget.initialValue == null) {
       WidgetsBinding.instance.addPostFrameCallback(
         (_) => extractData(widget.source),

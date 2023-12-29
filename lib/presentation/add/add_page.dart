@@ -94,6 +94,12 @@ class _AddPageState extends State<AddPage> {
                     );
                     return;
                   }
+                  if (category.parsing && documentContent == null) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Inserisci i metadati')),
+                    );
+                    return;
+                  }
                   BlocProvider.of<SyncCubit>(context).addDocument(
                     Document(
                       category: category,
