@@ -39,7 +39,7 @@ class _SearchDateRangeState extends State<SearchDateRange> {
             controller: startController,
             decoration: const InputDecoration(
               border: OutlineInputBorder(),
-              labelText: 'Data Inizio',
+              labelText: 'Inizio',
             ),
             readOnly: true,
             onTap: () async {
@@ -62,7 +62,7 @@ class _SearchDateRangeState extends State<SearchDateRange> {
           child: TextField(
             controller: endController,
             decoration: const InputDecoration(
-                border: OutlineInputBorder(), labelText: 'Data Fine'),
+                border: OutlineInputBorder(), labelText: 'Fine'),
             readOnly: true,
             onTap: () async {
               final pickedRange = await showDateRangePicker(
