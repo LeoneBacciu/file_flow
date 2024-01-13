@@ -92,7 +92,7 @@ class BillsPlot extends StatelessWidget {
             id: e.key,
             domainFn: (d, _) => d.date.copyWith(day: 1),
             measureFn: (d, _) => d.amount,
-            data: e.value + [DocumentPlotElement(initialDate, 0, '')],
+            data: e.value,
           ),
         )
         .toList();
