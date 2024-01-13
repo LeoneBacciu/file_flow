@@ -53,26 +53,19 @@ class _AddPageState extends State<AddPage> {
               ),
               const Separator.height(30),
               FilenameTextField(
-                onChange: (s) => setState(() => name = s),
+                onChange: (s) => (name = s),
               ),
               const Separator.height(30),
               TagSelectorField(
                 defaultTags: category.defaultTags,
-                onChange: (t) => setState(() => tags = t),
+                onChange: (t) => (tags = t),
               ),
               const Separator.height(30),
-              AnimatedSwitcher(
-                duration: const Duration(milliseconds: 500),
-                transitionBuilder:
-                    (Widget child, Animation<double> animation) =>
-                        ScaleTransition(scale: animation, child: child),
-                child: category.parsing && images.isNotEmpty
-                    ? ContentFormField(
-                        source: images.first,
-                        onChange: (c) => setState(() => documentContent = c),
-                      )
-                    : const SizedBox(),
-              ),
+              if (category.parsing && images.isNotEmpty)
+                ContentFormField(
+                  source: images.first,
+                  onChange: (c) => (documentContent = c),
+                ),
               const Separator.height(100),
             ],
           ),
