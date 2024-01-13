@@ -47,34 +47,21 @@ class _EditPageState extends State<EditPage> {
               const Separator.height(30),
               FilenameTextField(
                 initialValue: document.name,
-                onChange: (s) => setState(
-                  () => document = document.copyWith(name: s),
-                ),
+                onChange: (s) => (document = document.copyWith(name: s)),
               ),
               const Separator.height(30),
               TagSelectorField(
                 defaultTags: document.category.defaultTags.union(document.tags),
                 initialValue: document.tags,
-                onChange: (t) => setState(
-                  () => document = document.copyWith(tags: t),
-                ),
+                onChange: (t) => (document = document.copyWith(tags: t)),
               ),
               const Separator.height(30),
-              AnimatedSwitcher(
-                duration: const Duration(milliseconds: 500),
-                transitionBuilder:
-                    (Widget child, Animation<double> animation) =>
-                        ScaleTransition(scale: animation, child: child),
-                child: document.category.parsing && document.files.isNotEmpty
-                    ? ContentFormField(
-                        source: document.files.first,
-                        initialValue: document.content!,
-                        onChange: (c) => setState(
-                          () => document = document.copyWith(content: c),
-                        ),
-                      )
-                    : const SizedBox(),
-              ),
+              if (document.category.parsing && document.files.isNotEmpty)
+                ContentFormField(
+                  source: document.files.first,
+                  initialValue: document.content!,
+                  onChange: (c) => (document = document.copyWith(content: c)),
+                ),
             ],
           ),
         ),
