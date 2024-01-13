@@ -56,7 +56,6 @@ dependencies:
   animated_text_kit: ^4.2.2
   collection: ^1.18.0
   community_charts_flutter: ^1.0.2
-  #  flutter_document_scanner: ^1.1.0
   cunning_document_scanner:
     git:
       url: https://github.com/jachzen/cunning_document_scanner.git
