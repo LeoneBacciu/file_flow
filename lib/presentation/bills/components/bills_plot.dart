@@ -59,7 +59,12 @@ class BillsPlot extends StatelessWidget {
 
   List<charts.Series<DocumentPlotElement, DateTime>> makeSeries(
       DocumentList documents) {
-    final initialDate = DateTime.now().subtract(const Duration(days: 365));
+    if (documents.isEmpty) return [];
+
+    final latestDate = documents
+        .map((d) => d.content!.date)
+        .reduce((v, e) => v.isAfter(e) ? v : e);
+    final initialDate = latestDate.subtract(const Duration(days: 365));
     final groups = groupBy(
       documents
           .where(
